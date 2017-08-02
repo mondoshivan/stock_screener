@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title Stock Screener
+    meta name="keywords" content="stock,screener"
+    meta name="author" content="Oliver-Alexander Schmidt"
+    javascript:
+      console.log('index loaded');
+
+  body
+    #header
+      == slim :header
+
+    #content
+      == yield
+
+    #footer
+      == slim :footer
+          

@@ -1,0 +1,25 @@
+h1 Index
+p Welcome to my website made with Sinatra and HAML.
+p This is the home page and this is some text to fill out the home page.
+
+#search
+  form action="/" method="GET"
+    input type="text" name="symbol" placeholder="Symbol"
+    input.button type="submit" value="Search >>"
+
+#content
+  h1 =params[:symbol]
+
+  - if @symbol_exists
+    h2 It exists
+  - else
+    p It does not exist!
+
+#table
+  h1 Securities:
+
+  /- @asdg.each do |security|
+  /  p Exchange:= security.exchange
+  /  p Name:= security.name
+  /  p Symbol:= security.symbol
+  /  p Category:= security.category
