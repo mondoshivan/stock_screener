@@ -1,25 +1,34 @@
-h1 Index
-p Welcome to my website made with Sinatra and HAML.
-p This is the home page and this is some text to fill out the home page.
+h1 Searching
 
 #search
   form action="/" method="GET"
-    input type="text" name="symbol" placeholder="Symbol"
+    input type="text" name="search" placeholder="Exchange/Symbol/Name/Category"
     input.button type="submit" value="Search >>"
 
-#content
-  h1 =params[:symbol]
-
-  - if @symbol_exists
-    h2 It exists
-  - else
-    p It does not exist!
-
 #table
-  h1 Securities:
+  h1 Results:
 
-  /- @asdg.each do |security|
-  /  p Exchange:= security.exchange
-  /  p Name:= security.name
-  /  p Symbol:= security.symbol
-  /  p Category:= security.category
+  p Total: #{@total}
+
+  - if @securities.empty?
+    p No search results found!
+  - else
+    table
+      thead
+        tr
+          th Exchange
+          th Name
+          th Symbol
+          th Category
+      tbody
+        - @securities.each do |security|
+          tr
+            td= security.exchange
+            td= security.name
+            td= security.symbol
+            td= security.category
+
+  - if @indicators.empty? == false
+      #page-indicators
+        - @indicators.each do |page, symbol|
+          a class="indicator" href="/?page=#{page}&search=#{params[:search]}" = symbol

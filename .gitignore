@@ -1,2 +1,4 @@
 /Gemfile.lock
 /stock_screener.iml
+/development.db
+/test.db

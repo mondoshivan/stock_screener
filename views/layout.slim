@@ -1,19 +1,23 @@
 doctype html
-html
+html lang="en"
   head
     title Stock Screener
+    meta charset="utf-8"
     meta name="keywords" content="stock,screener"
     meta name="author" content="Oliver-Alexander Schmidt"
+    link rel="stylesheet" href="styles.css"
+
     javascript:
       console.log('index loaded');
 
   body
-    #header
+    header
       == slim :header
+      == slim :nav
 
-    #content
+    content
       == yield
 
-    #footer
+    footer
       == slim :footer
           
