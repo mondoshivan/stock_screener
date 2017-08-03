@@ -2,3 +2,5 @@
 /stock_screener.iml
 /development.db
 /test.db
+/.idea
+/.sass-cache
