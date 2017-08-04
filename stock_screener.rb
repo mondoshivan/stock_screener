@@ -19,6 +19,7 @@ require 'dm-migrations'
 require 'sass'
 require 'yaml'
 require 'logger'
+require 'yahoo-finance'
 
 require 'stock_screener/security_factory'
 require 'stock_screener/ratio_lookup'
@@ -46,6 +47,7 @@ end
 
 config = YAML.load_file('data/stocks.yaml')
 SECURITY_FACTORY = SecurityFactory.new(config)
+YAHOO_FINANCE = YahooFinance::Client.new
 
 
 ##################
@@ -72,15 +74,25 @@ get '/' do
   @securities = unfiltered[range]
   @indicators = @sh.indicators(@current_page)
 
-  logger.info "hitsPerPage: #{hitsPerPage.inspect}"
-  logger.info "@current_page: #{@current_page.inspect}"
-  logger.info "unfiltered: #{unfiltered.inspect}"
-  logger.info "@total: #{@total.inspect}"
-  logger.info "range: #{range.inspect}"
-  logger.info "@securities: #{@securities.inspect}"
-  logger.info "@indicators: #{@indicators.inspect}"
-
   slim :index
+end
+
+get '/security' do
+  logger.info "[route] get /security"
+
+  @security = SECURITY_FACTORY.getWithId(params[:id])
+  fields = [
+      :change_in_percent,
+      :last_trade_price
+  ]
+  @data = YAHOO_FINANCE.quotes(
+      [@security.symbol],
+      fields,
+      { na_as_nil: true }
+  )
+  @data = @data[0]
+  logger.info @data.inspect
+  slim :security
 end
 
 not_found do

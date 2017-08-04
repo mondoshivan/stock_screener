@@ -5,7 +5,7 @@ h1 Searching
     input type="text" name="search" placeholder="Exchange/Symbol/Name/Category"
     input.button type="submit" value="Search >>"
 
-#table
+#results
   h1 Results:
 
   p Total: #{@total}
@@ -13,20 +13,18 @@ h1 Searching
   - if @securities.empty?
     p No search results found!
   - else
-    table
-      thead
-        tr
-          th Exchange
-          th Name
-          th Symbol
-          th Category
-      tbody
-        - @securities.each do |security|
-          tr
-            td= security.exchange
-            td= security.name
-            td= security.symbol
-            td= security.category
+    div class="table"
+      div class="table-row head"
+        div class="table-cell head" Exchange
+        div class="table-cell head" Name
+        div class="table-cell head" Symbol
+        div class="table-cell head" Category
+      - @securities.each do |security|
+        a class="table-row" href="/security?id=#{security.id}"
+          div class="table-cell" = security.exchange
+          div class="table-cell" = security.name
+          div class="table-cell" = security.symbol
+          div class="table-cell" = security.category
 
   - if @indicators.empty? == false
       #page-indicators

@@ -23,8 +23,24 @@ describe SecurityFactory do
             }
         ]
         SecurityFactory.new(config)
-        # Security.all.count
-        # expect(Security.first.name).to eq(config[0][:Name])
+        expect(Security.all.count).to eq(config.length)
+      end
+    end
+  end
+
+  context "#get" do
+    context "given valid values" do
+      it "returns the correct security" do
+        config = [
+            {
+                :Exchange => "FRA",
+                :Name => 'Volkswagen Aktiengesellschaft',
+                :Ticker => 'VOW3.F',
+                :category => 'Auto'
+            }
+        ]
+        sf = SecurityFactory.new(config)
+        expect(sf.getWithId(1).symbol).to eq(config[0][:Ticker])
       end
     end
   end

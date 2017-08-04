@@ -1,4 +1,5 @@
 $red: #903;
+$green: #228B22;
 $black: #444;
 $white: #fff;
 $main-font: Helvetica, Arial, sans-serif;
@@ -48,8 +49,6 @@ p {
   font: 13px/1.4 $main-font;
 }
 
-
-
 a.indicator {
   padding: 10px;
   color: $red
@@ -57,4 +56,39 @@ a.indicator {
 
 a.indicator.selected {
   color: $black;
+}
+
+.table {
+  display:table;
+  background-color: $black
+}
+
+.table-row {
+  display:table-row;
+  text-decoration: none;
+  color: $white;
+  &:hover {
+    background: darken($black, 20%);
+  }
+}
+
+.table-row.head {
+  background: darken($black, 20%);
+}
+
+.table-cell {
+  display:table-cell;
+  padding: 5px;
+}
+
+.table-cell.head {
+  padding: 15px;
+}
+
+.red {
+  color: $red;
+}
+
+.green {
+  color: $green;
 }

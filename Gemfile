@@ -6,6 +6,7 @@ group :production, :development do
   gem 'data_mapper'
   gem 'dm-sqlite-adapter'
   gem 'sass'
+  gem 'yahoo-finance'
 end
 
 group :development do

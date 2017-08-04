@@ -58,4 +58,8 @@ class SecurityFactory
     return hits
   end
 
+  #################################################
+  def getWithId(id)
+    return Security.first(id: id.to_i)
+  end
 end
