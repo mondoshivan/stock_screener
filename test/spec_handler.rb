@@ -11,4 +11,4 @@ DataMapper.auto_upgrade!
 
 require 'stock_screener/security_spec'
 # require 'stock_screener/security_factory_spec'
-require 'stock_screener/search_handler_spec'
+require 'stock_screener/table_handler_spec'

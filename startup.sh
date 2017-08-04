@@ -9,7 +9,7 @@ else
     rspec test/spec_handler.rb
   else
     bundle install --with development
-    ruby $APP_FILE -p 45678
+    ruby $APP_FILE -p 4567
   fi
 fi
 

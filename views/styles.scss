@@ -48,6 +48,13 @@ p {
   font: 13px/1.4 $main-font;
 }
 
+
+
 a.indicator {
   padding: 10px;
+  color: $red
+}
+
+a.indicator.selected {
+  color: $black;
 }

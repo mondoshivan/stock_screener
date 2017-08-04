@@ -22,19 +22,21 @@ require 'logger'
 
 require 'stock_screener/security_factory'
 require 'stock_screener/ratio_lookup'
-require 'stock_screener/search_handler'
+require 'stock_screener/table_handler'
 
 
 #################
 # Configuration #
 #################
 
+DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/development.db")
+
 configure :production do
 
 end
 configure :development do
   require 'sinatra/reloader'
-  DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/development.db")
+
   # DataMapper.auto_migrate!
   DataMapper.auto_upgrade!
 end
@@ -42,7 +44,7 @@ configure :test do
 
 end
 
-config = YAML.load_file('data/stocks_short.yaml')
+config = YAML.load_file('data/stocks.yaml')
 SECURITY_FACTORY = SecurityFactory.new(config)
 
 
@@ -62,13 +64,21 @@ get '/' do
   logger.info "[route] get /"
 
   hitsPerPage = params[:hits]
-  @page = params[:page] ? params[:page] : 1
+  @current_page = params[:page] ? params[:page].to_i : 1
   unfiltered = SECURITY_FACTORY.include?(params[:search])
   @total = unfiltered.size
-  @sh = SearchHandler.new(@total, hitsPerPage)
-  range = @sh.rangeForPage(@page)
+  @sh = TableHandler.new(@total, hitsPerPage)
+  range = @sh.range_for_page(@current_page)
   @securities = unfiltered[range]
-  @indicators = SearchHandler.indicators
+  @indicators = @sh.indicators(@current_page)
+
+  logger.info "hitsPerPage: #{hitsPerPage.inspect}"
+  logger.info "@current_page: #{@current_page.inspect}"
+  logger.info "unfiltered: #{unfiltered.inspect}"
+  logger.info "@total: #{@total.inspect}"
+  logger.info "range: #{range.inspect}"
+  logger.info "@securities: #{@securities.inspect}"
+  logger.info "@indicators: #{@indicators.inspect}"
 
   slim :index
 end

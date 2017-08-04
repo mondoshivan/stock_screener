@@ -30,5 +30,8 @@ h1 Searching
 
   - if @indicators.empty? == false
       #page-indicators
-        - @indicators.each do |page, symbol|
-          a class="indicator" href="/?page=#{page}&search=#{params[:search]}" = symbol
+        - @indicators.each do |symbol, page|
+          - if page == @current_page
+            a class="indicator selected" href="/?page=#{page}&search=#{params[:search]}" = symbol
+          - else
+            a class="indicator" href="/?page=#{page}&search=#{params[:search]}" = symbol
