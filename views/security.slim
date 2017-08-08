@@ -1,13 +1,18 @@
+div style="display: block; width: 100%;"
+  div style="display: inline-block"
+    div class="float-left" style=""
+      h1 #{@security.symbol} #{@security.name}
+    div class="float-left" style=""
+      span #{@security.exchange}
 
-div
-  div
-    h1 #{@security.symbol} #{@security.name}
-  div
-    span #{@security.exchange}
+  div style="float: right; text-align: right;"
+    h1 class="" #{'%.2f' % @data.last_trade_price.to_f}
+    - if @data.change_in_percent.to_f < 0
+      h2 class="red" #{'%.2f' % @data.change_in_percent.to_f}%
+    - elsif @data.change_in_percent.to_f > 0
+      h2 class="green" #{'%.2f' % @data.change_in_percent.to_f}%
+    - else
+      h2 #{'%.2f' % @data.change_in_percent.to_f}%
 
-div
-  div class="" #{'%.2f' % @data.last_trade_price.to_f}
-  - if @data.change_in_percent.to_f < 0
-    div class="red" #{'%.2f' % @data.change_in_percent.to_f}%
-  - elsif @data.change_in_percent.to_f > 0
-    div class="green" #{'%.2f' % @data.change_in_percent.to_f}%
+#chart
+  == line_chart(@history, min: @min, max: @max)

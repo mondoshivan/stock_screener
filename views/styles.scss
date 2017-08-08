@@ -2,15 +2,24 @@ $red: #903;
 $green: #228B22;
 $black: #444;
 $white: #fff;
+$blue: #0081f2;
 $main-font: Helvetica, Arial, sans-serif;
+$contentWidth: 1000px;
 
 body {
+  margin: 0;
   font-family: $main-font;
 }
 
 h1 {
-  color: $red;
+  color: $black;
   font: 32px/1 $main-font;
+}
+
+header {
+  margin: 0 auto;
+  width: $contentWidth;
+  background-color: $black;
 }
 
 header h1 {
@@ -91,4 +100,22 @@ a.indicator.selected {
 
 .green {
   color: $green;
+}
+
+div#content {
+  //display: block;
+  width: $contentWidth;
+  margin: 0 auto;
+}
+
+.block {
+  display: block;
+}
+
+float-left {
+  float: left;
+}
+
+float-right {
+  float: right;
 }

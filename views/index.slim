@@ -1,19 +1,11 @@
-h1 Searching
-
-#search
-  form action="/" method="GET"
-    input type="text" name="search" placeholder="Exchange/Symbol/Name/Category"
-    input.button type="submit" value="Search >>"
 
 #results
   h1 Results:
 
-  p Total: #{@total}
-
   - if @securities.empty?
     p No search results found!
   - else
-    div class="table"
+    div class="table" style="width: 100%"
       div class="table-row head"
         div class="table-cell head" Exchange
         div class="table-cell head" Name
@@ -33,3 +25,5 @@ h1 Searching
             a class="indicator selected" href="/?page=#{page}&search=#{params[:search]}" = symbol
           - else
             a class="indicator" href="/?page=#{page}&search=#{params[:search]}" = symbol
+
+  p Total: #{@total}

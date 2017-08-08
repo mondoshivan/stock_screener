@@ -40,7 +40,7 @@ describe SecurityFactory do
             }
         ]
         sf = SecurityFactory.new(config)
-        expect(sf.getWithId(1).symbol).to eq(config[0][:Ticker])
+        expect(sf.get_with_id(1).symbol).to eq(config[0][:Ticker])
       end
     end
   end

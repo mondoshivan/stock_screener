@@ -7,6 +7,8 @@ group :production, :development do
   gem 'dm-sqlite-adapter'
   gem 'sass'
   gem 'yahoo-finance'
+  gem 'chartkick'
+  gem 'nokogiri'
 end
 
 group :development do

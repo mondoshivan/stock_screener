@@ -20,6 +20,9 @@ require 'sass'
 require 'yaml'
 require 'logger'
 require 'yahoo-finance'
+require 'chartkick'
+require 'nokogiri'
+
 
 require 'stock_screener/security_factory'
 require 'stock_screener/ratio_lookup'
@@ -39,7 +42,7 @@ configure :development do
   require 'sinatra/reloader'
 
   # DataMapper.auto_migrate!
-  DataMapper.auto_upgrade!
+  # DataMapper.auto_upgrade!
 end
 configure :test do
 
@@ -53,6 +56,7 @@ YAHOO_FINANCE = YahooFinance::Client.new
 ##################
 # Route Handlers #
 ##################
+
 
 before do
   logger.info "[params] #{params.inspect}"
@@ -80,7 +84,7 @@ end
 get '/security' do
   logger.info "[route] get /security"
 
-  @security = SECURITY_FACTORY.getWithId(params[:id])
+  @security = SECURITY_FACTORY.get_with_id(params[:id])
   fields = [
       :change_in_percent,
       :last_trade_price
@@ -91,7 +95,16 @@ get '/security' do
       { na_as_nil: true }
   )
   @data = @data[0]
+
+  @history = SECURITY_FACTORY.get_history(@security.symbol, 365)
+  padding = 0.01
+  @min = @history.values.min * (1 - padding)
+  @max = @history.values.max * (1 + padding)
+
   logger.info @data.inspect
+  logger.info @history.inspect
+  logger.info @min
+  logger.info @max
   slim :security
 end
 

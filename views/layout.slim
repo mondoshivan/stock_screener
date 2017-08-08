@@ -5,17 +5,19 @@ html lang="en"
     meta charset="utf-8"
     meta name="keywords" content="stock,screener"
     meta name="author" content="Oliver-Alexander Schmidt"
+    link rel="stylesheet" href="reset.css"
     link rel="stylesheet" href="styles.css"
 
-    javascript:
-      console.log('index loaded');
+
+    script type="text/javascript" src="https://www.google.com/jsapi"
+    script type="text/javascript" src="chartkick.js"
+
 
   body
     header
       == slim :header
-      == slim :nav
 
-    content
+    #content
       == yield
 
     footer
