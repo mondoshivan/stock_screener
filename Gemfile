@@ -9,6 +9,8 @@ group :production, :development do
   gem 'yahoo-finance'
   gem 'chartkick'
   gem 'nokogiri'
+  gem 'coffee-script'
+  gem 'therubyracer'
 end
 
 group :development do

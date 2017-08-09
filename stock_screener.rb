@@ -22,6 +22,8 @@ require 'logger'
 require 'yahoo-finance'
 require 'chartkick'
 require 'nokogiri'
+require 'coffee-script'
+require 'therubyracer'
 
 
 require 'stock_screener/security_factory'
@@ -43,13 +45,16 @@ configure :development do
 
   # DataMapper.auto_migrate!
   # DataMapper.auto_upgrade!
+
+  # config = YAML.load_file('data/stocks.yaml')
+  # initialize_securities(config)
 end
 configure :test do
 
 end
 
-config = YAML.load_file('data/stocks.yaml')
-SECURITY_FACTORY = SecurityFactory.new(config)
+
+SECURITY_FACTORY = SecurityFactory.new()
 YAHOO_FINANCE = YahooFinance::Client.new
 
 
@@ -66,17 +71,21 @@ get'/styles.css' do
   scss :styles
 end
 
+get('/application.js') do
+  coffee :application
+end
+
 get '/' do
   logger.info "[route] get /"
 
   hitsPerPage = params[:hits]
   @current_page = params[:page] ? params[:page].to_i : 1
-  unfiltered = SECURITY_FACTORY.include?(params[:search])
+  unfiltered = security_includes?(params[:search])
   @total = unfiltered.size
-  @sh = TableHandler.new(@total, hitsPerPage)
-  range = @sh.range_for_page(@current_page)
+  @th = TableHandler.new(@total, hitsPerPage)
+  range = @th.range_for_page(@current_page)
   @securities = unfiltered[range]
-  @indicators = @sh.indicators(@current_page)
+  @indicators = @th.indicators(@current_page)
 
   slim :index
 end
@@ -84,7 +93,7 @@ end
 get '/security' do
   logger.info "[route] get /security"
 
-  @security = SECURITY_FACTORY.get_with_id(params[:id])
+  @security = find_security_with_id(params[:id])
   fields = [
       :change_in_percent,
       :last_trade_price
@@ -105,7 +114,7 @@ get '/security' do
       'Max' => 0
   }
 
-  default = @periods['5D']
+  default = @periods['1Y']
   @history = SECURITY_FACTORY.get_history(
       @security.symbol,
       @periods[params[:period]] || default
@@ -119,7 +128,7 @@ get '/security' do
       'enableInteractivity' => true, # true, false
       'explorer' => nil, # { 'actions' => ['dragToZoom', 'rightClickToReset'] }, # nil, {}
       'pointSize' => 0,
-      'pointsVisible' => true,
+      'pointsVisible' => false,
       'trendlines' => {
           0 => {
               'type' => 'polynomial', #  linear, polynomial, and exponential.
