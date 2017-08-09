@@ -54,6 +54,10 @@ nav {
   font-weight: bold;
 }
 
+nav a.selected {
+  background: lighten($black, 5%);
+}
+
 p {
   font: 13px/1.4 $main-font;
 }

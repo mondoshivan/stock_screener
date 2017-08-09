@@ -15,4 +15,7 @@ div style="display: block; width: 100%;"
       h2 #{'%.2f' % @data.change_in_percent.to_f}%
 
 #chart
-  == line_chart(@history, min: @min, max: @max)
+  == line_chart(@history, min: @min, max: @max, library: @options)
+  div
+    - @periods.each do |name, value|
+      a class="indicator #{interval_selected?(name)}" href="/security?id=#{params[:id]}&period=#{name}" = name

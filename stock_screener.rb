@@ -96,10 +96,49 @@ get '/security' do
   )
   @data = @data[0]
 
-  @history = SECURITY_FACTORY.get_history(@security.symbol, 365)
+  @periods = {
+      '1D' => 1,
+      '5D' => 5,
+      '1M' => 30,
+      '6M' => 30 * 6,
+      '1Y' => 365,
+      'Max' => 0
+  }
+
+  default = @periods['5D']
+  @history = SECURITY_FACTORY.get_history(
+      @security.symbol,
+      @periods[params[:period]] || default
+  )
+
   padding = 0.01
   @min = @history.values.min * (1 - padding)
   @max = @history.values.max * (1 + padding)
+  @options = {
+      'curveType' => 'none', # none or function
+      'enableInteractivity' => true, # true, false
+      'explorer' => nil, # { 'actions' => ['dragToZoom', 'rightClickToReset'] }, # nil, {}
+      'pointSize' => 0,
+      'pointsVisible' => true,
+      'trendlines' => {
+          0 => {
+              'type' => 'polynomial', #  linear, polynomial, and exponential.
+              'color' => 'green',
+              'lineWidth' => 3,
+              'opacity' => 0.3,
+              'showR2' => true,
+              'visibleInLegend' => true,
+              'pointsVisible' => false,
+              'enableInteractivity' => false
+          }
+      },
+      'vAxis' => {
+          'gridlines' => {
+              'color' => '#333',
+              'count' => 8
+          }
+      }
+  }
 
   logger.info @data.inspect
   logger.info @history.inspect
@@ -108,6 +147,24 @@ get '/security' do
   slim :security
 end
 
+get '/portfolio' do
+  slim :portfolio
+end
+
 not_found do
   slim :not_found, :layout => :no_layout
+end
+
+helpers do
+  def interval_selected?(interval)
+    return interval == params[:period] ? 'selected' : nil
+  end
+
+  def table_page_selected?(page)
+    return page == @current_page ? 'selected' : nil
+  end
+
+  def nav_page_selected?(path='/')
+    (request.path==path || request.path==path+'/') ? 'selected' : nil
+  end
 end

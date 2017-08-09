@@ -21,9 +21,6 @@
   - if @indicators.empty? == false
       #page-indicators
         - @indicators.each do |symbol, page|
-          - if page == @current_page
-            a class="indicator selected" href="/?page=#{page}&search=#{params[:search]}" = symbol
-          - else
-            a class="indicator" href="/?page=#{page}&search=#{params[:search]}" = symbol
+          a class="indicator #{table_page_selected?(page)}" href="/?page=#{page}&search=#{params[:search]}" = symbol
 
   p Total: #{@total}
