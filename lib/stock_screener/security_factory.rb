@@ -1,4 +1,4 @@
-require 'stock_screener/security'
+
 
 class SecurityFactory
 

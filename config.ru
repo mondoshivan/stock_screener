@@ -1,6 +1,19 @@
-
 # Configuration files used by Rack apps
 
-require './stock_screener'
-run Sinatra::Application
+############################
+# Class Path - Adjustments #
+############################
 
+lib = File.expand_path("../lib", __FILE__)
+$:.unshift(lib) unless $:.include?(lib)
+
+
+############
+# Includes #
+############
+
+require 'sinatra/base'
+require 'stock_screener'
+
+map('/security') { run SecurityController }
+map('/') { run StockScreener }
