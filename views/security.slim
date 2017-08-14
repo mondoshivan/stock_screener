@@ -1,8 +1,8 @@
 div style="display: block; width: 100%;"
   div style="display: inline-block"
-    div class="float-left" style=""
+    div style=""
       h1 #{@security.symbol} #{@security.name}
-    div class="float-left" style=""
+    div style=""
       span #{@security.exchange}
 
   div style="float: right; text-align: right;"
@@ -14,8 +14,19 @@ div style="display: block; width: 100%;"
     - else
       h2 #{'%.2f' % @data.change_in_percent.to_f}%
 
-#chart
-  == line_chart(@history, min: @min, max: @max, library: @options)
-  div
-    - @periods.each do |name, value|
-      a class="indicator #{interval_selected?(name)}" href="/security?id=#{params[:id]}&period=#{name}" = name
+#dates style="padding-top: 50px;"
+  #quotes style="width: 50%; display: inline-block;"
+    div class="quote-row"
+      div class="quote-name" revenue
+      div class="quote-value" = @data.revenue
+    div class="quote-row"
+      div class="quote-name" ebitda
+      div class="quote-value" = @data.ebitda
+      div class="quote-value" #{@data.ebitda_marge}%
+      div class="quote-value" = @data.float_shares
+  #chart style="width: 50%; margin: 50; display: inline-block;"
+    #chart-indicators style="width: 50%; margin: 0 auto; text-align: center;"
+      - @periods.each do |name, value|
+        a class="indicator #{interval_selected?(name)}" href="/security?id=#{params[:id]}&period=#{name}" = name
+    == line_chart(@history, min: @min, max: @max, library: @library_options)
+

@@ -1,0 +1,9 @@
+h1 Settings
+
+form action="/settings/reset-db" method="post"
+  input type="hidden" name="_method" value="delete"
+  input type="submit" value="Reset DB"
+
+form action="/settings/symbols" method="post"
+  input type="hidden" name="_method" value="put"
+  input type="submit" value="Scan Symbols"

@@ -1,6 +1,0 @@
-
-
-class RatioLookup
-
-
-end

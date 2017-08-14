@@ -71,6 +71,16 @@ a.indicator.selected {
   color: $black;
 }
 
+.flash {
+  width: 600px;
+  padding: 5px;
+  font-weight: bold;
+  margin: 20px;
+  background: lighten($red, 60%);
+  color: $red;
+  border: 1px solid $red;
+}
+
 .table {
   display:table;
   background-color: $black
@@ -112,14 +122,11 @@ div#content {
   margin: 0 auto;
 }
 
-.block {
-  display: block;
+.quote-row {
+
 }
 
-float-left {
-  float: left;
-}
-
-float-right {
-  float: right;
+.quote-name, .quote-value {
+  width: 25%;
+  display: inline-block;
 }

@@ -15,5 +15,7 @@ $:.unshift(lib) unless $:.include?(lib)
 require 'sinatra/base'
 require 'stock_screener'
 
+map('/search') { run SearchController }
+map('/settings') { run SettingsController }
 map('/security') { run SecurityController }
 map('/') { run StockScreener }

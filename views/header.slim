@@ -4,11 +4,13 @@ div class="center" class="" style="display: block;"
       nav
         ul
           li
-            a class==nav_page_selected?('/') href="/" title="Home" Home
+            a class==nav_page_selected?('/') href="/" Home
           li
-            a class==nav_page_selected?('/portfolio') href="/portfolio" title="Portfolio" Portfolio
+            a class==nav_page_selected?('/portfolio') href="/portfolio" Portfolio
+          li
+            a class==nav_page_selected?('/settings') href="/settings" Settings
     div style="float: right;"
       #search
-        form action="/" method="GET"
+        form action="/search" method="GET"
           input type="text" name="search" placeholder="Exchange/Symbol/Name/Category"
           input.button type="submit" value="search"

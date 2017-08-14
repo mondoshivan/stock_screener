@@ -1,30 +1,22 @@
-class SecurityController < Sinatra::Base
+class SecurityController < Controller
 
+  use AssetHandler
   helpers SecurityHelpers
   helpers StockScreenerHelpers
-
-  configure do
-    set :root, File.join(File.dirname(__FILE__), '../../../')
-  end
 
   def interval_selected?(interval)
     return interval == params[:period] ? 'selected' : nil
   end
 
   get '/' do
-    logger.info "[route] get /security"
-
     @security = find_security_with_id(params[:id])
-    fields = [
-        :change_in_percent,
-        :last_trade_price
-    ]
-    @data = YAHOO_FINANCE.quotes(
+    @data = get_quotes(
+        YahooFinance::Client.new,
         [@security.symbol],
-        fields,
-        { na_as_nil: true }
+        [:change_in_percent, :last_trade_price, :revenue, :ebitda, :float_shares],
+        :na_as_nil => true
     )
-    @data = @data[0]
+    @data[:ebitda_marge] = '%.2f' % (get_number(@data.ebitda) / get_number(@data.revenue) * 100)
 
     @periods = {
         '1D' => 1,
@@ -36,7 +28,7 @@ class SecurityController < Sinatra::Base
     }
 
     default = @periods['1Y']
-    @history = SECURITY_FACTORY.get_history(
+    @history = get_history(
         @security.symbol,
         @periods[params[:period]] || default
     )
@@ -44,7 +36,10 @@ class SecurityController < Sinatra::Base
     padding = 0.01
     @min = @history.values.min * (1 - padding)
     @max = @history.values.max * (1 + padding)
-    @options = {
+
+    # Google Chart Options
+    @library_options = {
+        'chartArea' => {'width'=> '80%', 'height' => '90%'},
         'curveType' => 'none', # none or function
         'enableInteractivity' => true, # true, false
         'explorer' => nil, # { 'actions' => ['dragToZoom', 'rightClickToReset'] }, # nil, {}
@@ -70,10 +65,8 @@ class SecurityController < Sinatra::Base
         }
     }
 
-    logger.info @data.inspect
-    logger.info @history.inspect
-    logger.info @min
-    logger.info @max
+
+
     slim :security
   end
 end

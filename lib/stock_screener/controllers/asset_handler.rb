@@ -1,6 +1,7 @@
-class AssetHandler < Sinatra::Base
+
+
+class AssetHandler < Controller
   configure do
-    set :root, File.join(File.dirname(__FILE__), '../../')
     set :views, settings.root + '/assets'
     set :jsdir, 'js'
     set :cssdir, 'css'
@@ -16,10 +17,6 @@ class AssetHandler < Sinatra::Base
   end
 
   get '/*.css' do
-    puts "settings.root: #{settings.root}"
-    puts "settings.view: #{settings.views}"
-
-    logger.info "get css: settings.root #{settings.root}"
     last_modified File.mtime(settings.root + '/assets/' + settings.cssdir)
     cache_control :public, :must_revalidate
     send(settings.cssengine, (settings.cssdir + '/' + params[:splat].first).to_sym)

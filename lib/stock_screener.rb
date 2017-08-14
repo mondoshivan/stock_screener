@@ -7,6 +7,7 @@
 
 require 'sinatra/base'
 require 'sinatra/reloader'
+require 'sinatra/flash'
 require 'slim'
 require 'dm-core'
 require 'dm-migrations'
@@ -19,19 +20,26 @@ require 'nokogiri'
 require 'coffee-script'
 require 'therubyracer'
 
-require 'stock_screener/helpers/stock_screener_helpers'
-require 'stock_screener/security_factory'
-require 'stock_screener/ratio_lookup'
 require 'stock_screener/table_handler'
-require 'stock_screener/asset_handler'
-require 'stock_screener/helpers/security_helpers'
-require 'stock_screener/controllers/security_controller'
-require 'stock_screener/models/security'
 
-SECURITY_FACTORY = SecurityFactory.new()
+# Helpers
+require 'stock_screener/helpers/stock_screener_helpers'
+require 'stock_screener/helpers/security_helpers'
+
+# Controllers
+require 'stock_screener/controllers/controller'
+require 'stock_screener/controllers/asset_handler'
+require 'stock_screener/controllers/security_controller'
+require 'stock_screener/controllers/settings_controller'
+require 'stock_screener/controllers/search_controller'
+
+# Models
+require 'stock_screener/models/security'
+require 'stock_screener/models/category'
+
 YAHOO_FINANCE = YahooFinance::Client.new
 
-class StockScreener < Sinatra::Base
+class StockScreener < Controller
 
   use AssetHandler
   helpers SecurityHelpers
@@ -45,29 +53,14 @@ class StockScreener < Sinatra::Base
     DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/development.db")
   end
   configure :development do
-    register Sinatra::Reloader
-    enable :reloader
-
     set :root, File.join(File.dirname(__FILE__), '..')
 
     DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/development.db")
-    # DataMapper.auto_migrate!
     # DataMapper.auto_upgrade!
 
-    # config = YAML.load_file('data/stocks.yaml')
-    # initialize_securities(config)
   end
   configure :test do
 
-  end
-
-
-  ###########
-  # Helpers #
-  ###########
-
-  def table_page_selected?(page)
-    return page == @current_page ? 'selected' : nil
   end
 
 
@@ -75,23 +68,7 @@ class StockScreener < Sinatra::Base
   # Route Handlers #
   ##################
 
-
-  before do
-    logger.info "[params] #{params.inspect}"
-  end
-
   get '/' do
-    logger.info "[route] get /"
-
-    hitsPerPage = params[:hits]
-    @current_page = params[:page] ? params[:page].to_i : 1
-    unfiltered = security_includes?(params[:search])
-    @total = unfiltered.size
-    @th = TableHandler.new(@total, hitsPerPage)
-    range = @th.range_for_page(@current_page)
-    @securities = unfiltered[range]
-    @indicators = @th.indicators(@current_page)
-
     slim :index
   end
 
@@ -102,5 +79,8 @@ class StockScreener < Sinatra::Base
   not_found do
     slim :not_found, :layout => :no_layout
   end
+
+  # directly executed (then we need to call 'run') or by another file?
+  run! if __FILE__ == $0
 
 end

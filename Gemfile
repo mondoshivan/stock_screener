@@ -11,6 +11,7 @@ group :production, :development do
   gem 'nokogiri'
   gem 'coffee-script'
   gem 'therubyracer'
+  gem 'sinatra-flash'
 end
 
 group :development do
