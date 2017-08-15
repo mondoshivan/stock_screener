@@ -1,6 +1,7 @@
 class SecurityController < Controller
 
   use AssetHandler
+  helpers SearchHelpers
   helpers SecurityHelpers
   helpers StockScreenerHelpers
 

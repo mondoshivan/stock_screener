@@ -13,24 +13,31 @@ module SecurityHelpers
   # Checks if a given string exists in a Security attribute.
   # * *Args*    :
   #   - +string+ -> search string
+  #   - +string+ -> max hits (0 = all)
   # * *Returns* :
   #   - array with Security objects
   #
-  def security_includes?(string)
-    hits = []
+  def security_includes?(string, **options)
     return hits if string.nil?
     string = string.upcase
+    options[:max] = options[:max].nil? ? 0 : options[:max]
+    options[:filter][:category] = 'all' if options[:filter][:category].nil?
+    options[:filter][:exchange] = 'all' if options[:filter][:exchange].nil?
+    options[:filter].delete(:category) if options[:filter][:category].downcase == 'all'
+    options[:filter].delete(:exchange) if options[:filter][:exchange].downcase == 'all'
 
-    Security.all.each do |security|
-      if security.exchange.upcase.include?(string)
+    hits = []
+    Security.all(options[:filter]).each do |security|
+      if Exchange.get(security.exchange).name.upcase.include?(string)
         hits << security
       elsif security.name.upcase.include?(string)
         hits << security
       elsif security.symbol.upcase.include?(string)
         hits << security
-      elsif security.category.upcase.include?(string)
+      elsif Security.get(security.category).name.upcase.include?(string)
         hits << security
       end
+      break if options[:max] > 0 && options[:max] == hits.count
     end
     return hits
   end
@@ -55,9 +62,12 @@ module SecurityHelpers
       # insert category
       category = Category.first_or_create(name: hash["categoryName"])
 
+      # insert exchange
+      exchange = Exchange.first_or_create(name: hash["Exchange"])
+
       # add
       Security.create(
-          exchange: hash["Exchange"],
+          exchange: exchange.id,
           name: hash["Name"],
           symbol: hash["Ticker"],
           category: category.id

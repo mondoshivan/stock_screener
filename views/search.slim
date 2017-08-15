@@ -5,14 +5,24 @@ h1 Search: #{params[:search]}
     #category-query
       label Category
       select name="category"
-        option value="All" All
+        option value="all" All
         - Category.all.each do |category|
           - if category.name == ''
             - next
-          - if category.id == params[:category].to_i
-            option value="#{category.id}" selected="selected" = category.name
-          - else
-            option value="#{category.id}" = category.name
+          option value==category.id selected==category_selected?(category) = category.name
+    #exchange-query
+      label Exchange
+      select name="exchange"
+        option value="all" All
+        - Exchange.all.each do |exchange|
+          - if exchange.name == ''
+            - next
+          option value==exchange.id selected==exchange_selected?(exchange) = exchange.name
+    #hitsperpage
+      label Hits
+      select name="hits"
+        -settings.hits.each do |hits|
+          option value==hits selected==hits_selected?(hits) = hits
 
     input type="hidden" name="search" value="#{params[:search]}"
     input type="submit" value="Search"
@@ -29,7 +39,7 @@ h1 Search: #{params[:search]}
         div class="table-cell head" Category
       - @securities.each do |security|
         a class="table-row" href="/security?id=#{security.id}"
-          div class="table-cell" = security.exchange
+          div class="table-cell" = Exchange.get(security.exchange).name
           div class="table-cell" = security.name
           div class="table-cell" = security.symbol
           div class="table-cell" = Category.get(security.category).name
@@ -37,6 +47,6 @@ h1 Search: #{params[:search]}
   - if @indicators.empty? == false
     #page-indicators
       - @indicators.each do |symbol, page|
-        a class="indicator #{table_page_selected?(page)}" href="/?page=#{page}&search=#{params[:search]}" = symbol
+        a class="indicator #{table_page_selected?(page)}" href==page_indicator_href(page) = symbol
 
   p Total: #{@total}

@@ -19,12 +19,14 @@ require 'chartkick'
 require 'nokogiri'
 require 'coffee-script'
 require 'therubyracer'
+require 'uri'
 
 require 'stock_screener/table_handler'
 
 # Helpers
 require 'stock_screener/helpers/stock_screener_helpers'
 require 'stock_screener/helpers/security_helpers'
+require 'stock_screener/helpers/search_helpers'
 
 # Controllers
 require 'stock_screener/controllers/controller'
@@ -36,12 +38,14 @@ require 'stock_screener/controllers/search_controller'
 # Models
 require 'stock_screener/models/security'
 require 'stock_screener/models/category'
+require 'stock_screener/models/exchange'
 
 YAHOO_FINANCE = YahooFinance::Client.new
 
 class StockScreener < Controller
 
   use AssetHandler
+  helpers SearchHelpers
   helpers SecurityHelpers
   helpers StockScreenerHelpers
 

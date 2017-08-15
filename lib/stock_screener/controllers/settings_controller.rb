@@ -2,12 +2,22 @@
 class SettingsController < Controller
 
   use AssetHandler
+  helpers SearchHelpers
   helpers SecurityHelpers
   helpers StockScreenerHelpers
 
   configure do
     enable :method_override
-    set :data, 'data'
+    set :data_dir, settings.root + '/data'
+    set :country, {
+        :all => 'All',
+        :us => 'United States',
+        :dr => 'Germany',
+        :fr => 'France',
+        :hk => 'Hong Kong',
+        :gb => 'Great Britain',
+        :gr => 'Greece'
+    }
   end
 
   get '/' do
@@ -20,17 +30,25 @@ class SettingsController < Controller
     redirect to('/')
   end
 
-  put '/symbols' do
+  get '/symbols' do
     Thread.new do
-      dataDir = settings.root + '/' + settings.data
-      Dir.chdir(dataDir)
-      market = 'gr' # us, dr (germany), fr, hk, gb, gr (grece), all
-      logger.info %x{YahooTickerDownloader.py -m #{market} stocks}
-      initialize_securities(YAML.load_file('stocks.yaml'))
+      Dir.chdir(settings.data_dir)
       Dir.glob('./stocks.*').each { |file| File.delete(file)}
+      logger.info %x{YahooTickerDownloader.py -m #{params[:country]} stocks}
       Dir.chdir(settings.root)
     end
-    flash[:notice] = "Adding symbols to Database"
+    flash[:notice] = "Downloading Symbols in Background"
+    redirect to('/')
+  end
+
+  put '/init-symbols' do
+    Thread.new do
+      Dir.chdir(settings.data_dir)
+      file = 'stocks.yaml'
+      initialize_securities(YAML.load_file(file))
+      Dir.chdir(settings.root)
+    end
+    flash[:notice] = "Adding Symbols to Database in Background"
     redirect to('/')
   end
 

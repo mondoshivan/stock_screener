@@ -12,5 +12,8 @@ div class="center" class="" style="display: block;"
     div style="float: right;"
       #search
         form action="/search" method="GET"
+          - request.env['rack.request.query_hash'].each do |name, value|
+            - next if name == 'search'
+            input type="hidden" name==name value==value
           input type="text" name="search" placeholder="Exchange/Symbol/Name/Category"
           input.button type="submit" value="search"

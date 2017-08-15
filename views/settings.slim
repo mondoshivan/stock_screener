@@ -4,6 +4,12 @@ form action="/settings/reset-db" method="post"
   input type="hidden" name="_method" value="delete"
   input type="submit" value="Reset DB"
 
-form action="/settings/symbols" method="post"
+form action="/settings/symbols" method="get"
+  select name="country"
+    - settings.country.each do |symbol, name|
+      option value="#{symbol.to_s}" = name
+  input type="submit" value="Get Symbols" title=""
+
+form action="/settings/init-symbols" method="post"
   input type="hidden" name="_method" value="put"
-  input type="submit" value="Scan Symbols"
+  input type="submit" value="Init Symbols"
