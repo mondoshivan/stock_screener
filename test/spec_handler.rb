@@ -9,6 +9,5 @@ DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/test.db")
 DataMapper.auto_migrate!
 DataMapper.auto_upgrade!
 
-require 'stock_screener/security_spec'
-# require 'stock_screener/security_factory_spec'
 require 'stock_screener/table_handler_spec'
+require 'stock_screener/helpers/security_helpers_spec'

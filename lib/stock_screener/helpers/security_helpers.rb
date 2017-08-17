@@ -82,7 +82,10 @@ module SecurityHelpers
         fields,
         options
     )
-    return @data[0]
+
+    @data = @data[0]
+    @data.to_h.each {|k,v| @data[k] = get_number(v) unless v.nil?}
+    return @data
   end
 
   #################################################
@@ -133,7 +136,17 @@ module SecurityHelpers
   end
 
   #################################################
+  # Searches for postfix char on last
+  # position in a string and replaces the char with
+  # its corresponding number.
+  #
+  # * *Args*    :
+  #   - +string+ ->
+  # * *Returns* :
+  #   - float
+  #
   def get_number(string)
+    raise TypeError, "Illegal type: #{string.class}" unless string.kind_of?(String)
     string.strip!
     return string.to_f if string !~ /^\d+\.?\d+[mb]$/i
     char = string[-1].upcase
@@ -141,6 +154,30 @@ module SecurityHelpers
     multipliers = {'M' => 1000000, 'B' => 1000000000}
     rs = number * multipliers[char]
     return rs
+  end
+
+  #################################################
+  # Transforms a number into a string. Big numbers
+  # are shorted and added with a postfix char
+  #
+  # * *Args*    :
+  #   - +number+ ->
+  # * *Returns* :
+  #   - string
+  #
+  def get_string(number)
+    raise TypeError, "Illegal Type: #{number.class}" unless number.kind_of?(Numeric)
+    multipliers = {'M' => 1000000, 'B' => 1000000000}
+    case true
+      when number >= multipliers['B']
+        rs = number / multipliers['B']
+        return rs % 1 != 0 ? "#{(rs).round(2)}B" : "#{rs.to_i}B"
+      when number >= multipliers['M']
+        rs = number / multipliers['M']
+        return rs % 1 != 0 ? "#{(rs).round(2)}M" : "#{rs.to_i}M"
+      else
+        return number % 1 != 0 ? '%.2f' % number : "#{number.to_i}"
+    end
   end
 
 end

@@ -2,28 +2,50 @@ div style="display: block; width: 100%;"
   div style="display: inline-block"
     div style=""
       h1 #{@security.symbol} #{@security.name}
-    div style=""
-      span #{@security.exchange}
+    div style="" title="Exchange"
+      span #{Exchange.get(@security.exchange).name}
 
   div style="float: right; text-align: right;"
-    h1 class="" #{'%.2f' % @data.last_trade_price.to_f}
-    - if @data.change_in_percent.to_f < 0
-      h2 class="red" #{'%.2f' % @data.change_in_percent.to_f}%
-    - elsif @data.change_in_percent.to_f > 0
-      h2 class="green" #{'%.2f' % @data.change_in_percent.to_f}%
-    - else
-      h2 #{'%.2f' % @data.change_in_percent.to_f}%
+    h1 title="Last Trade Price" = get_string(@data.last_trade_price)
+    h2 class==get_change_color() title="Change (Change in %)" = get_change()
 
 #dates style="padding-top: 50px;"
   #quotes style="width: 50%; display: inline-block;"
     div class="quote-row"
-      div class="quote-name" revenue
-      div class="quote-value" = @data.revenue
-    div class="quote-row"
+      div class="quote-name"
+      div class="quote-name"
+      div class="quote-name" Margin
+      div class="quote-name"
+    div class="quote-row" title="Revenue (trailing 12 month)"
+      div class="quote-name" Revenue (ttm)
+      div class="quote-value" = get_string(@data.revenue)
+    div class="quote-row" title="Earnings before Interests Tax Depreciation Allowance"
       div class="quote-name" ebitda
-      div class="quote-value" = @data.ebitda
-      div class="quote-value" #{@data.ebitda_marge}%
-      div class="quote-value" = @data.float_shares
+      div class="quote-value" = get_string(@data.ebitda)
+      div class="quote-value" = get_string(@data.ebitda_marge)
+      div class="quote-value" = get_string(@data.float_shares)
+    div class="quote-row" title="Earnings per Share"
+      div class="quote-name" Profit
+      div class="quote-name" = get_string(@data.profit)
+    div class="quote-row"
+      div class="quote-name" Market Cap
+      div class="quote-name" = get_string(@data.market_capitalization)
+      div class="quote-name" = get_string(@data.stocks)
+      div class="quote-name" = get_string(@data.shares_outstanding)
+    div class="quote-row"
+      div class="quote-name" Short Ratio
+      div class="quote-name" = get_string(@data.short_ratio)
+    div class="quote-row" title="Price Earnings Ratio"
+      div class="quote-name" P/E Ratio
+      div class="quote-name" = get_string(@data.pe_ratio)
+    div class="quote-row" title="Earnings per Share"
+      div class="quote-name" EPS
+      div class="quote-name" = get_string(@data.earnings_per_share)
+    div class="quote-row" title="Volume"
+      div class="quote-name" Volume
+      div class="quote-name" = get_string(@data.volume)
+
+
   #chart style="width: 50%; margin: 50; display: inline-block;"
     #chart-indicators style="width: 50%; margin: 0 auto; text-align: center;"
       - @periods.each do |name, value|

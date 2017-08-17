@@ -11,6 +11,16 @@ class Security
   property :symbol, String
   property :category, String
 
+  # property :revenue, Integer
+  # property :gross_profit, Integer
+  # property :ebitda, Integer
+  # property :ebit, Integer
+  # property :ebt, Integer
+  # property :net_profit, Integer
+  #
+  # property :equity, Integer
+  # property :dept, Integer
+
 end
 
 DataMapper.finalize
