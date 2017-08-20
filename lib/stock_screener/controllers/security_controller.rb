@@ -153,10 +153,9 @@ class SecurityController < Controller
     )
 
     @data[:ebitda_marge] = @data.ebitda / @data.revenue * 100
-    @data[:stocks] = @data.market_capitalization / @data.last_trade_price
     @data[:profit] = @data.earnings_per_share * @data.shares_outstanding
 
-    logger.info @data.inspect
+    @data.to_h.each {|k,v| logger.info "#{k}: #{v}"}
 
     @periods = {
         '1D' => 1,
@@ -179,7 +178,7 @@ class SecurityController < Controller
 
     # Google Chart Options
     @library_options = {
-        'chartArea' => {'width'=> '80%', 'height' => '90%'},
+        'chartArea' => {'width'=> '80%', 'height' => '80%'},
         'curveType' => 'none', # none or function
         'enableInteractivity' => true, # true, false
         'explorer' => nil, # { 'actions' => ['dragToZoom', 'rightClickToReset'] }, # nil, {}

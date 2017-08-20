@@ -18,7 +18,7 @@ module SecurityHelpers
   #   - array with Security objects
   #
   def security_includes?(string, **options)
-    return hits if string.nil?
+    return [] if string.nil?
     string = string.upcase
     options[:max] = options[:max].nil? ? 0 : options[:max]
     options[:filter][:category] = 'all' if options[:filter][:category].nil?
@@ -166,7 +166,7 @@ module SecurityHelpers
   #   - string
   #
   def get_string(number)
-    raise TypeError, "Illegal Type: #{number.class}" unless number.kind_of?(Numeric)
+    return nil unless number.kind_of?(Numeric)
     multipliers = {'M' => 1000000, 'B' => 1000000000}
     case true
       when number >= multipliers['B']
