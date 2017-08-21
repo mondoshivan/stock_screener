@@ -89,6 +89,18 @@ module SecurityHelpers
   end
 
   #################################################
+  def get_static_quotes(symbol)
+    quotes = Hash.new
+    Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{symbol}/key-statistics")).xpath('//table[starts-with(@class, "table-qsp-stats")]/tbody/tr').each do |row|
+      name = row.xpath('td').first.xpath('span').text.strip
+      value = row.xpath('td').last.text.strip
+      next if value.upcase == 'N/A'
+      quotes[name] = get_number(value)
+    end
+    return quotes
+  end
+
+  #################################################
   # Get the history of a security.
   # * *Args*    :
   #   - +symbol+ -> the symbol of the security

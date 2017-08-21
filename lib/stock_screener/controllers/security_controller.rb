@@ -155,7 +155,11 @@ class SecurityController < Controller
     @data[:ebitda_marge] = @data.ebitda / @data.revenue * 100
     @data[:profit] = @data.earnings_per_share * @data.shares_outstanding
 
+    @static_data = get_static_quotes(@security.symbol)
+
     @data.to_h.each {|k,v| logger.info "#{k}: #{v}"}
+    logger.info "---------------"
+    @static_data.each {|k,v| logger.info "#{k}: #{v}"}
 
     @periods = {
         '1D' => 1,
