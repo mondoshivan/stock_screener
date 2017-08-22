@@ -83,21 +83,68 @@ module SecurityHelpers
         options
     )
 
-    @data = @data[0]
-    @data.to_h.each {|k,v| @data[k] = get_number(v) unless v.nil?}
+    @data.each do |symbol_data|
+      symbol_data.to_h.each do |k,v|
+        if v.nil?
+          symbol_data.delete_field(k)
+          next
+        end
+        symbol_data[k] = get_number(v)
+      end
+    end
+
     return @data
   end
 
   #################################################
-  def get_static_quotes(symbol)
-    quotes = Hash.new
-    Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{symbol}/key-statistics")).xpath('//table[starts-with(@class, "table-qsp-stats")]/tbody/tr').each do |row|
-      name = row.xpath('td').first.xpath('span').text.strip
-      value = row.xpath('td').last.text.strip
-      next if value.upcase == 'N/A'
-      quotes[name] = get_number(value)
+  def get_static_quotes(symbols, data=[OpenStruct.new])
+    symbols.each_with_index do |symbol, index|
+      Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{symbol}/key-statistics")).xpath('//table[starts-with(@class, "table-qsp-stats")]/tbody/tr').each do |row|
+        name = row.xpath('td').first.xpath('span').text.strip.downcase.gsub(' ', '_').to_sym
+        value = row.xpath('td').last.text.strip
+        next if value.upcase == 'N/A'
+        data[index][name] = get_number(value) unless data[index][name]
+      end
     end
-    return quotes
+
+    return data
+  end
+
+  #################################################
+  def get_finance_quotes(symbols, data=[OpenStruct.new])
+    symbols.each_with_index do |symbol, index|
+      data[index].financial = Hash.new
+      Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{symbol}/financials")).css('section[data-test="qsp-financial"]').each do |section|
+        data[index].financial[symbol] = Hash.new
+        date1 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[1].xpath('span').text
+        date2 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[2].xpath('span').text
+        date3 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[3].xpath('span').text
+        date4 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[4].xpath('span').text
+
+        from = 1
+        to = section.xpath('div').last.xpath('table/tbody/tr').size - 1
+        (from..to).each do |i|
+          tr = section.xpath('div').last.xpath('table/tbody/tr')[i]
+          next if tr.xpath('td').size < 2 # at least name and one value should exist
+          name = tr.xpath('td')[0].xpath('span').text # quote name
+          data[index].financial[symbol][name] = Hash.new
+          tr.xpath('td').each_with_index do |td, i|
+            case i
+              when 1
+                data[index].financial[symbol][name][date1] = tr.xpath('td')[1].xpath('span').text
+              when 2
+                data[index].financial[symbol][name][date2] = tr.xpath('td')[2].xpath('span').text
+              when 3
+                data[index].financial[symbol][name][date3] = tr.xpath('td')[3].xpath('span').text
+              when 4
+                data[index].financial[symbol][name][date4] = tr.xpath('td')[4].xpath('span').text
+            end
+          end
+        end
+      end
+    end
+
+    return data
   end
 
   #################################################

@@ -41,9 +41,10 @@ class SecurityController < Controller
 
   get '/' do
     @security = find_security_with_id(params[:id])
+    symbols = [@security.symbol]
     @data = get_quotes(
         YahooFinance::Client.new,
-        [@security.symbol],
+        symbols,
         # [
         #     :change,
         #     :change_in_percent,
@@ -152,14 +153,14 @@ class SecurityController < Controller
         :na_as_nil => true
     )
 
-    @data[:ebitda_marge] = @data.ebitda / @data.revenue * 100
-    @data[:profit] = @data.earnings_per_share * @data.shares_outstanding
+    @data[0][:ebitda_marge] = @data[0].ebitda / @data[0].revenue * 100
+    @data[0][:profit] = @data[0].earnings_per_share * @data[0].shares_outstanding
 
-    @static_data = get_static_quotes(@security.symbol)
+    @data = get_static_quotes(symbols, @data)
+    @data = get_finance_quotes(symbols, @data)
 
+    @data = @data[0]
     @data.to_h.each {|k,v| logger.info "#{k}: #{v}"}
-    logger.info "---------------"
-    @static_data.each {|k,v| logger.info "#{k}: #{v}"}
 
     @periods = {
         '1D' => 1,
