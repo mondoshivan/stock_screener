@@ -46,8 +46,9 @@ class SettingsController < Controller
     Thread.new do
       Dir.chdir(settings.data_dir)
       file = 'stocks.yaml'
-      initialize_securities(YAML.load_file(file))
+      yaml = YAML.load_file(file)
       Dir.chdir(settings.root)
+      initialize_securities(yaml)
     end
     flash[:notice] = "Adding Symbols to Database in Background"
     redirect to('/')
