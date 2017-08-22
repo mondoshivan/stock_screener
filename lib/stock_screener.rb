@@ -20,6 +20,7 @@ require 'nokogiri'
 require 'coffee-script'
 require 'therubyracer'
 require 'uri'
+require 'fileutils'
 
 require 'stock_screener/table_handler'
 

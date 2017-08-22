@@ -32,6 +32,7 @@ class SettingsController < Controller
 
   get '/symbols' do
     Thread.new do
+      FileUtils.mkdir_p(settings.data_dir)
       Dir.chdir(settings.data_dir)
       Dir.glob('./stocks.*').each { |file| File.delete(file)}
       logger.info %x{YahooTickerDownloader.py -m #{params[:country]} stocks}
