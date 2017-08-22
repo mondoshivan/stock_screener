@@ -58,6 +58,13 @@ describe SecurityHelpers do
         expect(extended_class.get_number(string)).to be 0.0
       end
     end
+
+    context "given value with comma seperation" do
+      it "returns a float" do
+        string = "234,234,000"
+        expect(extended_class.get_number(string)).to be 234234000.0
+      end
+    end
   end
 
   context "#get_string" do

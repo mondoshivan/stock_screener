@@ -114,30 +114,33 @@ module SecurityHelpers
   def get_finance_quotes(symbols, data=[OpenStruct.new])
     symbols.each_with_index do |symbol, index|
       data[index].financial = Hash.new
-      Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{symbol}/financials")).css('section[data-test="qsp-financial"]').each do |section|
-        data[index].financial[symbol] = Hash.new
-        date1 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[1].xpath('span').text
-        date2 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[2].xpath('span').text
-        date3 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[3].xpath('span').text
-        date4 = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[4].xpath('span').text
 
-        from = 1
-        to = section.xpath('div').last.xpath('table/tbody/tr').size - 1
-        (from..to).each do |i|
-          tr = section.xpath('div').last.xpath('table/tbody/tr')[i]
-          next if tr.xpath('td').size < 2 # at least name and one value should exist
-          name = tr.xpath('td')[0].xpath('span').text # quote name
-          data[index].financial[symbol][name] = Hash.new
-          tr.xpath('td').each_with_index do |td, i|
-            case i
-              when 1
-                data[index].financial[symbol][name][date1] = tr.xpath('td')[1].xpath('span').text
-              when 2
-                data[index].financial[symbol][name][date2] = tr.xpath('td')[2].xpath('span').text
-              when 3
-                data[index].financial[symbol][name][date3] = tr.xpath('td')[3].xpath('span').text
-              when 4
-                data[index].financial[symbol][name][date4] = tr.xpath('td')[4].xpath('span').text
+      page = {
+          :income_statement => "https://finance.yahoo.com/quote/#{symbol}/financials",
+          :balance_sheet => "https://finance.yahoo.com/quote/#{symbol}/balance-sheet",
+          :cash_flow => "https://finance.yahoo.com/quote/#{symbol}/cash-flow"
+      }
+
+      page.each do |page_type, url|
+        Nokogiri::HTML(open(url)).css('section[data-test="qsp-financial"]').each do |section|
+          data[index].financial[page_type] = Hash.new
+
+          date = {}
+          (1..4).each {|i| date[i] = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[i].xpath('span').text }
+
+          from = 1
+          to = section.xpath('div').last.xpath('table/tbody/tr').size - 1
+          (from..to).each do |i|
+            tr = section.xpath('div').last.xpath('table/tbody/tr')[i]
+            next if tr.xpath('td').size < 2 # at least name and one value should exist
+            name = tr.xpath('td')[0].xpath('span').text # quote name
+            data[index].financial[page_type][name] = Hash.new
+            tr.xpath('td').each_with_index do |td, i|
+              next if i == 0 # this is the name
+              next unless date[i] # more values than dates not excepted
+              value = tr.xpath('td')[i].xpath('span').text.strip
+              next if value == ''
+              data[index].financial[page_type][name][date[i]] = get_number(value)
             end
           end
         end
@@ -206,7 +209,7 @@ module SecurityHelpers
   #
   def get_number(string)
     raise TypeError, "Illegal type: #{string.class}" unless string.kind_of?(String)
-    string.strip!
+    string = string.strip.gsub(',', '')
     return string.to_f if string !~ /^\d+\.?\d+[mb]$/i
     char = string[-1].upcase
     number = string[0..-2].to_f
