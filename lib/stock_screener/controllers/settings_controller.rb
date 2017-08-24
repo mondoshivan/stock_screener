@@ -20,6 +20,10 @@ class SettingsController < Controller
     }
   end
 
+  before do
+    protected!
+  end
+
   get '/' do
     slim :settings
   end

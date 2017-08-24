@@ -12,6 +12,7 @@ group :production, :development do
   gem 'coffee-script'
   gem 'therubyracer'
   gem 'sinatra-flash'
+  gem 'bcrypt-ruby', :require => 'bcrypt'
 end
 
 group :development do

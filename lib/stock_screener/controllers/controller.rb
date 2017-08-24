@@ -3,6 +3,7 @@
 class Controller < Sinatra::Base
 
   register Sinatra::Flash
+  register Sinatra::Auth
 
   configure do
     enable :sessions

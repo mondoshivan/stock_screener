@@ -18,4 +18,6 @@ require 'stock_screener'
 map('/search') { run SearchController }
 map('/settings') { run SettingsController }
 map('/security') { run SecurityController }
+map('/portfolio') { run PortfolioController }
+map('/users') { run UsersController }
 map('/') { run StockScreener }

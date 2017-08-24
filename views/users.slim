@@ -1,0 +1,18 @@
+h1 Users
+
+#users
+  - if User.all.empty?
+    p No Users found!
+  - else
+    div class="table" style="width: 100%"
+      div class="table-row head"
+        div class="table-cell head" ID
+        div class="table-cell head" Name
+        div class="table-cell head" Password
+        div class="table-cell head" Admin
+      - User.all.each do |user|
+        a class="table-row" href="/users/user?id=#{user.id}"
+          div class="table-cell" = user.id
+          div class="table-cell" = user.name
+          div class="table-cell" = user.password
+          div class="table-cell" = user.admin
