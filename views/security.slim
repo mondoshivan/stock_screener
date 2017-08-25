@@ -3,11 +3,15 @@ div style="display: block; width: 100%;"
     div style=""
       h1 #{@security.symbol} #{@security.name}
     div style="" title="Exchange"
-      span #{Exchange.get(@security.exchange).name}
+      span #{@security.exchange.name}
 
   div style="float: right; text-align: right;"
     h1 title="Last Trade Price" = get_string(@data.last_trade_price)
-    h2 class==get_change_color() title="Change (Change in %)" = get_change()
+    h2 class==get_change_color(@data.change_in_percent) title="Change (Change in %)" = get_change()
+
+- if logged_in?
+  #trade
+    a href="/security/trade?security_id=#{@security.id}" trade
 
 #dates style="padding-top: 50px;"
   #quotes style="width: 50%; display: inline-block; float: left"

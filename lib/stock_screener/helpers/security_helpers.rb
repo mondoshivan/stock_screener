@@ -28,13 +28,13 @@ module SecurityHelpers
 
     hits = []
     Security.all(options[:filter]).each do |security|
-      if Exchange.get(security.exchange).name.upcase.include?(string)
+      if security.exchange.name.upcase.include?(string)
         hits << security
       elsif security.name.upcase.include?(string)
         hits << security
       elsif security.symbol.upcase.include?(string)
         hits << security
-      elsif Security.get(security.category).name.upcase.include?(string)
+      elsif security.category.name.upcase.include?(string)
         hits << security
       end
       break if options[:max] > 0 && options[:max] == hits.count
@@ -59,18 +59,12 @@ module SecurityHelpers
       # only add, if it does not already exist
       next if !Security.first(symbol: hash["Ticker"]).nil?
 
-      # insert category
-      category = Category.first_or_create(name: hash["categoryName"])
-
-      # insert exchange
-      exchange = Exchange.first_or_create(name: hash["Exchange"])
-
       # add
-      Security.create(
-          exchange: exchange.id,
+      sec = Security.create(
+          exchange: Exchange.first_or_create(name: hash["Exchange"]),
+          category: Category.first_or_create(name: hash["categoryName"]),
           name: hash["Name"],
-          symbol: hash["Ticker"],
-          category: category.id
+          symbol: hash["Ticker"]
       ).save
     end
   end
@@ -239,6 +233,16 @@ module SecurityHelpers
         return rs % 1 != 0 ? "#{(rs).round(2)}M" : "#{rs.to_i}M"
       else
         return number % 1 != 0 ? '%.2f' % number : "#{number.to_i}"
+    end
+  end
+
+  def get_change_color(change)
+    if change < 0
+      return "red"
+    elsif change > 0
+      return "green"
+    else
+      return nil
     end
   end
 

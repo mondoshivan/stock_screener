@@ -30,6 +30,7 @@ module Sinatra
         if @user
           session[:admin] = @user.admin
           session[:logged_in] = true
+          session[:user_id] = @user.id
           flash[:notice] = "You are now logged in as #{@user.name}"
           redirect to('/')
         else

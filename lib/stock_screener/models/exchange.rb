@@ -10,4 +10,3 @@ class Exchange
 
 end
 
-DataMapper.finalize

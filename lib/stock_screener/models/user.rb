@@ -10,8 +10,8 @@ class User
   property :password, String
   property :admin, Boolean, :default  => false
 
+  has n, :items
 end
 
-DataMapper.finalize
 
 

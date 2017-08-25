@@ -1,4 +1,27 @@
+h1 Portfolio
+
+div class="table" style="width: 100%"
+  div class="table-row head"
+    div class="table-cell head" Name
+    div class="table-cell head" Exchange
+    div class="table-cell head" Purchased
+    div class="table-cell head" Purchase Price
+    div class="table-cell head" Volume
+    div class="table-cell head" Change
+    div class="table-cell head" Total
+  - @portfolio.each do |item|
+    a class="table-row" href="/security?security_id=#{item.security.id}"
+      div class="table-cell" = item.security.name
+      div class="table-cell" = item.security.exchange.name
+      div class="table-cell" = item.signed_at.strftime("%d.%m.%Y")
+      div class="table-cell" = get_string(item.price)
+      div class="table-cell" = item.volume
+      div class="table-cell #{get_change_color(@changes[item.security.id][0])}" #{get_string(@changes[item.security.id][0])} (#{get_string(@changes[item.security.id][1])}%)
+      div class="table-cell #{get_change_color(@changes[item.security.id][2])}" = get_string(@changes[item.security.id][2 ])
+
+
 form method="POST" action="/songs"
   label for="released_on" Date(mm/dd/yyyy):
   input#released_on type="text" name="so" value="23.23.33333"
   input type="submit" value="Save Song"
+

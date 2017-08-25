@@ -1,6 +1,7 @@
 class SecurityController < Controller
 
   use AssetHandler
+  helpers UsersHelpers
   helpers SearchHelpers
   helpers SecurityHelpers
   helpers StockScreenerHelpers
@@ -14,33 +15,13 @@ class SecurityController < Controller
     return interval == params[:period] ? 'selected' : nil
   end
 
-  def get_change()
-    if @data.change_in_percent < 0
-      return "#{get_string(@data.change)} (#{get_string(@data.change_in_percent)} %)"
-    elsif @data.change_in_percent > 0
-      return "#{'+' if @data.change > 0 }#{get_string(@data.change)} (#{'+' if @data.change > 0}#{get_string(@data.change_in_percent)} %)"
-    else
-      return "#{'%.2f' % @data.change_in_percent.to_f}%"
-    end
-  end
-
-  def get_change_color()
-    if @data.change_in_percent < 0
-      return "red"
-    elsif @data.change_in_percent > 0
-      return "green"
-    else
-      return nil
-    end
-  end
-
 
   ##################
   # Route Handlers #
   ##################
 
   get '/' do
-    @security = find_security_with_id(params[:id])
+    @security = find_security_with_id(params[:security_id])
     symbols = [@security.symbol]
     @data = get_quotes(
         YahooFinance::Client.new,
@@ -213,4 +194,51 @@ class SecurityController < Controller
 
     slim :security
   end
+
+  get '/trade' do
+    logged_in!
+    @security = find_security_with_id(params[:security_id])
+
+    symbols = [@security.symbol]
+    @data = get_quotes(
+        YahooFinance::Client.new,
+        symbols,
+        [
+            :change,
+            :change_in_percent,
+            :last_trade_price,
+            :volume
+        ],
+
+        :na_as_nil => true
+    )
+    @data = @data[0]
+
+    slim :trade
+  end
+
+  put '/trade' do
+    logged_in!
+    @security = find_security_with_id(params[:security_id])
+
+    @data = get_quotes(
+        YahooFinance::Client.new,
+        [@security.symbol],
+        [:last_trade_price],
+        :na_as_nil => true
+    )
+    @data = @data[0]
+
+    Item.create(
+            security: find_security_with_id(params[:security_id]),
+            user: get_user_with_id(session[:user_id]),
+            volume: params[:volume].to_i,
+            price: @data[:last_trade_price],
+            signed_at: DateTime.now
+    ).save
+
+    flash[:notice] = "Sucessfull traded!"
+    redirect to("/?security_id=#{@security.id}")
+  end
+
 end

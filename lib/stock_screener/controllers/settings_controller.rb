@@ -7,7 +7,6 @@ class SettingsController < Controller
   helpers StockScreenerHelpers
 
   configure do
-    enable :method_override
     set :data_dir, settings.root + '/data'
     set :country, {
         :all => 'All',
@@ -49,6 +48,7 @@ class SettingsController < Controller
   put '/init-symbols' do
     Thread.new do
       Dir.chdir(settings.data_dir)
+      pwd = Dir.pwd
       file = 'stocks.yaml'
       yaml = YAML.load_file(file)
       Dir.chdir(settings.root)

@@ -1,0 +1,13 @@
+h1 Trade
+
+p #{@security.symbol}
+p Exchange: #{@security.exchange.name}
+p #{@security.name}
+p Price: #{get_string(@data.last_trade_price)}
+
+form action="/security/trade" method ="post"
+  input type="hidden" name="_method" value="put"
+  input type="hidden" name="security_id" value==@security.id
+  label for="volume" Volume:
+  input type="text" name="volume"
+  input type="submit" value="buy"

@@ -7,6 +7,7 @@ class Controller < Sinatra::Base
 
   configure do
     enable :sessions
+    enable :method_override
     set :root, File.join(File.dirname(__FILE__), '../../../')
   end
 

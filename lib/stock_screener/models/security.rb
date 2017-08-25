@@ -6,10 +6,11 @@ class Security
   include DataMapper::Resource
 
   property :id, Serial
-  property :exchange, String
   property :name, String
   property :symbol, String
-  property :category, String
+
+  belongs_to :category
+  belongs_to :exchange
 
   # property :revenue, Integer
   # property :gross_profit, Integer
@@ -23,6 +24,6 @@ class Security
 
 end
 
-DataMapper.finalize
+
 
 

@@ -3,7 +3,7 @@ h1 Search: #{params[:search]}
 #query
   form action="/search" method="get"
     #category-query
-      label Category
+      label for="category" Category
       select name="category"
         option value="all" All
         - Category.all.each do |category|
@@ -11,7 +11,7 @@ h1 Search: #{params[:search]}
             - next
           option value==category.id selected==category_selected?(category) = category.name
     #exchange-query
-      label Exchange
+      label for="exchange" Exchange
       select name="exchange"
         option value="all" All
         - Exchange.all.each do |exchange|
@@ -19,7 +19,7 @@ h1 Search: #{params[:search]}
             - next
           option value==exchange.id selected==exchange_selected?(exchange) = exchange.name
     #hitsperpage
-      label Hits
+      label for="hits" Hits
       select name="hits"
         -settings.hits.each do |hits|
           option value==hits selected==hits_selected?(hits) = hits
@@ -38,11 +38,11 @@ h1 Search: #{params[:search]}
         div class="table-cell head" Symbol
         div class="table-cell head" Category
       - @securities.each do |security|
-        a class="table-row" href="/security?id=#{security.id}"
-          div class="table-cell" = Exchange.get(security.exchange).name
+        a class="table-row" href="/security?security_id=#{security.id}"
+          div class="table-cell" = security.exchange.name
           div class="table-cell" = security.name
           div class="table-cell" = security.symbol
-          div class="table-cell" = Category.get(security.category).name
+          div class="table-cell" = security.category.name
 
   - if @indicators.empty? == false
     #page-indicators

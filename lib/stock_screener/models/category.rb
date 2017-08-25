@@ -10,6 +10,5 @@ class Category
 
 end
 
-DataMapper.finalize
 
 
