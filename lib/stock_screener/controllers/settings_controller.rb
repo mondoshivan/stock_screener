@@ -69,16 +69,18 @@ class SettingsController < Controller
       logger.info "Handling: #{security.symbol}"
       symbols = [security.symbol]
       data = get_income_statements(symbols)
+
+      all = IncomeStatement.all
       data[0][:income_statement].each do |date, numbers|
-        # ToDo: Check if IncomeStatement already exists!
+        date = Date.strptime(date, '%m/%d/%Y')
+        next if IncomeStatement.first(security: security, date: date)
         income_statement = IncomeStatement.new(numbers)
-        income_statement.date = Date.strptime(date, '%m/%d/%Y')
+        income_statement.date = date
         income_statement.period = IncomeStatement::PERIOD[:yearly]
         security.income_statements << income_statement
         security.save
         income_statement.save
       end
-      break
     end
     flash[:notice] = "Scan is running in background"
     redirect to('/')

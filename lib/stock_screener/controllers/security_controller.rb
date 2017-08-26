@@ -129,7 +129,7 @@ class SecurityController < Controller
             volume: params[:volume].to_i,
             price: @data[:last_trade_price],
             signed_at: DateTime.now
-    ).save
+    )
 
     flash[:notice] = "Added to your portfolio!"
     redirect to("/?security_id=#{@security.id}")

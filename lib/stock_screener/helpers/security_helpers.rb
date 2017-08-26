@@ -65,7 +65,7 @@ module SecurityHelpers
           category: Category.first_or_create(name: hash["categoryName"]),
           name: hash["Name"],
           symbol: hash["Ticker"]
-      ).save
+      )
     end
   end
 

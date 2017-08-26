@@ -63,8 +63,17 @@ class StockScreener < Controller
   # Configuration #
   #################
 
+  configure do
+
+  end
+
   configure :production do
-    DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/development.db")
+    set :root, File.join(File.dirname(__FILE__), '..')
+
+    DataMapper.finalize
+    DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/production.db")
+    DataMapper.auto_upgrade!
+
   end
   configure :development do
     set :root, File.join(File.dirname(__FILE__), '..')
@@ -72,13 +81,8 @@ class StockScreener < Controller
     DataMapper.finalize
     DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/development.db")
     DataMapper.auto_migrate!
-    DataMapper.auto_upgrade!
 
-    User.create(
-            name: 'admin',
-            password: 'admin',
-            admin: true
-    ).save
+    User.create(name: 'admin', password: 'admin', admin: true)
   end
   configure :test do
 
@@ -110,7 +114,7 @@ class StockScreener < Controller
           name: params["username"],
           password: params["password"],
           admin: (params["admin"] == 'admin')
-      ).save
+      )
       flash[:notice] = "New user registered!"
       redirect to('/login')
     end
