@@ -12,19 +12,26 @@ class PortfolioController < Controller
   get '/' do
     options = {:user => get_user_with_id(session[:user_id])}
     @portfolio = Item.all(options)
+
     @changes = {}
     @portfolio.each do |item|
-      @data = get_quotes(
-          YahooFinance::Client.new,
-          [item.security.symbol],
-          [:last_trade_price],
-          :na_as_nil => true
-      )
+      symbols = [item.security.symbol]
+      @data = get_last_price(symbols)
       @data = @data[0]
       change = @data.last_trade_price - item.price
       change_in_percent = change / item.price * 100
-      total = change * item.volume
-      @changes[item.security.id] = [change, change_in_percent, total]
+      total_change = change * item.volume
+      total_current_value = item.volume * @data.last_trade_price
+      total_purchase_value = item.volume * item.price
+      @changes[item.security.id] = {
+          :last_trade_price => @data.last_trade_price,
+          :change => change,
+          :change_in_percent => change_in_percent,
+          :total_change => total_change,
+          :total_current_value => total_current_value,
+          :total_purchase_value => total_purchase_value,
+          :color => get_change_color(change)
+      }
     end
 
     slim :portfolio

@@ -6,7 +6,7 @@ div style="display: block; width: 100%;"
       span #{@security.exchange.name}
 
   div style="float: right; text-align: right;"
-    h1 title="Last Trade Price" = get_string(@data.last_trade_price)
+    h1 title="Last Trade Price" = get_string_from_number(@data.last_trade_price)
     h2 class==get_change_color(@data.change_in_percent) title="Change (Change in %)" = get_change()
 
 - if logged_in?
@@ -22,49 +22,49 @@ div style="display: block; width: 100%;"
       div class="quote-name"
     div class="quote-row" title="Revenue (trailing 12 month)"
       div class="quote-name" Revenue (ttm)
-      div class="quote-value" = get_string(@data.revenue)
+      div class="quote-value" = get_string_from_number(@data.revenue)
     div class="quote-row" title="Earnings before Interests Tax Depreciation Allowance"
       div class="quote-name" ebitda
-      div class="quote-value" = get_string(@data.ebitda)
-      div class="quote-value" = get_string(@data.ebitda_marge)
+      div class="quote-value" = get_string_from_number(@data.ebitda)
+      div class="quote-value" = get_string_from_number(@data.ebitda_marge)
     div class="quote-row" title="Earnings per Share"
       div class="quote-name" Profit
-      div class="quote-name" = get_string(@data.profit)
+      div class="quote-name" = get_string_from_number(@data.profit)
     div class="quote-row"
       div class="quote-name" Market Cap
-      div class="quote-name" = get_string(@data.market_capitalization)
+      div class="quote-name" = get_string_from_number(@data.market_capitalization)
     div class="quote-row"
       div class="quote-name" Market Cap Realtime
-      div class="quote-name" = get_string(@data.market_cap_realtime)
+      div class="quote-name" = get_string_from_number(@data.market_cap_realtime)
     div class="quote-row"
       div class="quote-name" Shares Outstanding
-      div class="quote-name" = get_string(@data.shares_outstanding)
+      div class="quote-name" = get_string_from_number(@data.shares_outstanding)
     div class="quote-row"
       div class="quote-name" Shares Floating
-      div class="quote-name" = get_string(@data.float_shares)
+      div class="quote-name" = get_string_from_number(@data.float_shares)
     div class="quote-row"
       div class="quote-name" Short Ratio
-      div class="quote-name" = get_string(@data.short_ratio)
+      div class="quote-name" = get_string_from_number(@data.short_ratio)
     div class="quote-row" title="Price Earnings Ratio"
       div class="quote-name" P/E Ratio
-      div class="quote-name" = get_string(@data.pe_ratio)
+      div class="quote-name" = get_string_from_number(@data.pe_ratio)
     div class="quote-row" title="Earnings per Share"
       div class="quote-name" EPS
-      div class="quote-name" = get_string(@data.earnings_per_share)
+      div class="quote-name" = get_string_from_number(@data.earnings_per_share)
     div class="quote-row" title="Book Value"
       div class="quote-name" Book Value
-      div class="quote-name" = get_string(@data.book_value)
+      div class="quote-name" = get_string_from_number(@data.book_value)
     div class="quote-row" title="Volume"
       div class="quote-name" Volume
-      div class="quote-name" = get_string(@data.volume)
+      div class="quote-name" = get_string_from_number(@data.volume)
     div class="quote-row" title="Average Daily Volume"
       div class="quote-name" Average Daily Volume
-      div class="quote-name" = get_string(@data.average_daily_volume)
+      div class="quote-name" = get_string_from_number(@data.average_daily_volume)
 
 
   #chart style="width: 50%; display: inline-block; float: left; padding-top: 20px"
     #chart-indicators style="width: 50%; margin: 0 auto; text-align: center;"
       - @periods.each do |name, value|
-        a class="indicator #{interval_selected?(name)}" href="/security?id=#{params[:id]}&period=#{name}" = name
-    == line_chart(@history, min: @min, max: @max, library: @library_options)
+        a class="indicator #{interval_selected?(name)}" href="/security?security_id=#{params[:security_id]}&period=#{name}" = name
+    == line_chart(@history, min: @min, max: @max, library: settings.google_chart_config)
 

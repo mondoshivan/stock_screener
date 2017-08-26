@@ -12,6 +12,8 @@ class Security
   belongs_to :category
   belongs_to :exchange
 
+  has n, :income_statements
+
   # property :revenue, Integer
   # property :gross_profit, Integer
   # property :ebitda, Integer

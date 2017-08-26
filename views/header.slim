@@ -1,6 +1,6 @@
 div class="center" class="" style="display: block;"
   div class="" style="display: block; width: 100%"
-    div style="display: inline-block;"
+    div style="display: inline-block; width: 75%"
       nav
         ul
           li
@@ -16,17 +16,18 @@ div class="center" class="" style="display: block;"
             li
               a class==nav_page_selected?('/settings') href="/settings" Settings
 
-    div style="float: right;"
-      #search
+    div style="display: inline-block; width: 25%"
+      #search style=""
         form action="/search" method="GET"
           - request.env['rack.request.query_hash'].each do |name, value|
             - next if name == 'search'
             input type="hidden" name==name value==value
           input type="text" name="search" placeholder="Exchange/Symbol/Name/Category"
           input.button type="submit" value="search"
-      #auth
-        - if session[:logged_in]
-          a href="/logout" logout
-        - else
-          a href="/login" login
-          a href="/register" register
+      #auth style=""
+        div style=""
+          - if session[:logged_in]
+            a style="color: white" href="/logout" logout
+          - else
+            a style="color: white; padding-right: 10px" href="/login" login
+            a style="color: white" href="/register" register

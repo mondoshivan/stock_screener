@@ -47,6 +47,7 @@ require 'stock_screener/models/category'
 require 'stock_screener/models/exchange'
 require 'stock_screener/models/user'
 require 'stock_screener/models/portfolio_items'
+require 'stock_screener/models/income_statement'
 
 YAHOO_FINANCE = YahooFinance::Client.new
 

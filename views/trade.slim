@@ -3,7 +3,7 @@ h1 Trade
 p #{@security.symbol}
 p Exchange: #{@security.exchange.name}
 p #{@security.name}
-p Price: #{get_string(@data.last_trade_price)}
+p Price: #{get_string_from_number(@data.last_trade_price)}
 
 form action="/security/trade" method ="post"
   input type="hidden" name="_method" value="put"

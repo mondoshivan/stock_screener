@@ -3,21 +3,25 @@ h1 Portfolio
 div class="table" style="width: 100%"
   div class="table-row head"
     div class="table-cell head" Name
-    div class="table-cell head" Exchange
     div class="table-cell head" Purchased
-    div class="table-cell head" Purchase Price
-    div class="table-cell head" Volume
+    div class="table-cell head" Bought
     div class="table-cell head" Change
-    div class="table-cell head" Total
+    div class="table-cell head" Value
   - @portfolio.each do |item|
     a class="table-row" href="/security?security_id=#{item.security.id}"
       div class="table-cell" = item.security.name
-      div class="table-cell" = item.security.exchange.name
-      div class="table-cell" = item.signed_at.strftime("%d.%m.%Y")
-      div class="table-cell" = get_string(item.price)
-      div class="table-cell" = item.volume
-      div class="table-cell #{get_change_color(@changes[item.security.id][0])}" #{get_string(@changes[item.security.id][0])} (#{get_string(@changes[item.security.id][1])}%)
-      div class="table-cell #{get_change_color(@changes[item.security.id][2])}" = get_string(@changes[item.security.id][2 ])
+      div class="table-cell"
+        div class="table-sub-cell" = item.security.exchange.name
+        div class="table-sub-cell" = item.signed_at.strftime("%d.%m.%Y | %H:%M")
+      div class="table-cell"
+        div class="table-sub-cell" title="Price (Volume)" #{get_string_from_number(item.price)} (#{item.volume})
+        div class="table-sub-cell" title="Value" = get_string_from_number(@changes[item.security.id][:total_purchase_value])
+      div class="table-cell"
+        div class="table-sub-cell" title="Last Price" = get_string_from_number(@changes[item.security.id][:last_trade_price])
+        div class="table-sub-cell #{@changes[item.security.id][:color]}" title="Change" #{get_string_from_number(@changes[item.security.id][:change])} (#{get_string_from_number(@changes[item.security.id][:change_in_percent])}%)
+      div class="table-cell"
+        div class="table-sub-cell #{@changes[item.security.id][:color]}" = get_string_from_number(@changes[item.security.id][:total_current_value])
+        div class="table-sub-cell #{@changes[item.security.id][:color]}" = get_string_from_number(@changes[item.security.id][:total_change])
 
 
 form method="POST" action="/songs"

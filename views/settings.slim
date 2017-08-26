@@ -1,8 +1,9 @@
 h1 Settings
 
-form action="/settings/reset-db" method="post"
-  input type="hidden" name="_method" value="delete"
-  input type="submit" value="Reset DB"
+- if settings.development?
+  form action="/settings/reset-db" method="post"
+    input type="hidden" name="_method" value="delete"
+    input type="submit" value="Reset DB"
 
 form action="/settings/symbols" method="get"
   select name="country"
@@ -13,3 +14,11 @@ form action="/settings/symbols" method="get"
 form action="/settings/init-symbols" method="post"
   input type="hidden" name="_method" value="put"
   input type="submit" value="Init Symbols"
+
+form action="/settings/scan" method="post"
+  select name="exchange_id"
+    - Exchange.all.each do |exchange|
+      - next if exchange.name == ''
+      option value==exchange.id =exchange.name
+  input type="hidden" name="_method" value="put"
+  input type="submit" value="Scan"

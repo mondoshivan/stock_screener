@@ -70,34 +70,13 @@ module SecurityHelpers
   end
 
   #################################################
-  def get_quotes(api, symbols, fields, **options)
-    @data = api.quotes(
-        symbols,
-        fields,
-        options
-    )
-
-    @data.each do |symbol_data|
-      symbol_data.to_h.each do |k,v|
-        if v.nil?
-          symbol_data.delete_field(k)
-          next
-        end
-        symbol_data[k] = get_number(v)
-      end
-    end
-
-    return @data
-  end
-
-  #################################################
   def get_static_quotes(symbols, data=[OpenStruct.new])
     symbols.each_with_index do |symbol, index|
       Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{symbol}/key-statistics")).xpath('//table[starts-with(@class, "table-qsp-stats")]/tbody/tr').each do |row|
         name = row.xpath('td').first.xpath('span').text.strip.downcase.gsub(' ', '_').to_sym
         value = row.xpath('td').last.text.strip
         next if value.upcase == 'N/A'
-        data[index][name] = get_number(value) unless data[index][name]
+        data[index][name] = get_number_from_string(value) unless data[index][name]
       end
     end
 
@@ -105,9 +84,23 @@ module SecurityHelpers
   end
 
   #################################################
-  def get_finance_quotes(symbols, data=[OpenStruct.new])
+  def get_income_statements(symbols, data=[OpenStruct.new])
+    return get_finance_quotes(:income_statement, symbols, data=[OpenStruct.new])
+  end
+
+  #################################################
+  def get_balance_sheets(symbols, data=[OpenStruct.new])
+    return get_finance_quotes(:balance_sheet, symbols, data=[OpenStruct.new])
+  end
+
+  #################################################
+  def get_cash_flows(symbols, data=[OpenStruct.new])
+    return get_finance_quotes(:cash_flow, symbols, data=[OpenStruct.new])
+  end
+
+  #################################################
+  def get_finance_quotes(page_type, symbols, data=[OpenStruct.new])
     symbols.each_with_index do |symbol, index|
-      data[index].financial = Hash.new
 
       page = {
           :income_statement => "https://finance.yahoo.com/quote/#{symbol}/financials",
@@ -115,27 +108,30 @@ module SecurityHelpers
           :cash_flow => "https://finance.yahoo.com/quote/#{symbol}/cash-flow"
       }
 
-      page.each do |page_type, url|
-        Nokogiri::HTML(open(url)).css('section[data-test="qsp-financial"]').each do |section|
-          data[index].financial[page_type] = Hash.new
+      Nokogiri::HTML(open(page[page_type])).css('section[data-test="qsp-financial"]').each do |section|
+        data[index][page_type] = Hash.new
 
-          date = {}
-          (1..4).each {|i| date[i] = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[i].xpath('span').text }
+        # {1: '2017', 2: '2016', ...}
+        date = {}
+        (1..4).each do |i|
+          date[i] = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[i].xpath('span').text
+          data[index][page_type][date[i]] = {}
+        end
 
-          from = 1
-          to = section.xpath('div').last.xpath('table/tbody/tr').size - 1
-          (from..to).each do |i|
-            tr = section.xpath('div').last.xpath('table/tbody/tr')[i]
-            next if tr.xpath('td').size < 2 # at least name and one value should exist
-            name = tr.xpath('td')[0].xpath('span').text # quote name
-            data[index].financial[page_type][name] = Hash.new
-            tr.xpath('td').each_with_index do |td, i|
-              next if i == 0 # this is the name
-              next unless date[i] # more values than dates not excepted
-              value = tr.xpath('td')[i].xpath('span').text.strip
-              next if value == ''
-              data[index].financial[page_type][name][date[i]] = get_number(value)
-            end
+        from = 1
+        to = section.xpath('div').last.xpath('table/tbody/tr').size - 1
+        (from..to).each do |i|
+          tr = section.xpath('div').last.xpath('table/tbody/tr')[i]
+          next if tr.xpath('td').size < 2 # at least name and one value should exist
+          name = tr.xpath('td')[0].xpath('span').text.gsub(/[\s\/]/, '_').downcase.to_sym # quote name
+          tr.xpath('td').each_with_index do |td, i|
+            next if i == 0 # this is the name
+            next unless date[i] # more values than dates not excepted
+            value = tr.xpath('td')[i].xpath('span').text.strip
+            next if value == ''
+            multiplier = 1000 # all values are shown in thousands
+            number = get_number_from_string(value) * multiplier
+            data[index][page_type][date[i]][name] = number
           end
         end
       end
@@ -201,7 +197,7 @@ module SecurityHelpers
   # * *Returns* :
   #   - float
   #
-  def get_number(string)
+  def get_number_from_string(string)
     raise TypeError, "Illegal type: #{string.class}" unless string.kind_of?(String)
     string = string.strip.gsub(',', '')
     return string.to_f if string !~ /^\d+\.?\d+[mb]$/i
@@ -221,21 +217,23 @@ module SecurityHelpers
   # * *Returns* :
   #   - string
   #
-  def get_string(number)
+  def get_string_from_number(number)
     return nil unless number.kind_of?(Numeric)
     multipliers = {'M' => 1000000, 'B' => 1000000000}
     case true
       when number >= multipliers['B']
         rs = number / multipliers['B']
-        return rs % 1 != 0 ? "#{(rs).round(2)}B" : "#{rs.to_i}B"
+        rs = rs % 1 != 0 ? "#{(rs).round(2)}B" : "#{rs.to_i}B"
       when number >= multipliers['M']
         rs = number / multipliers['M']
-        return rs % 1 != 0 ? "#{(rs).round(2)}M" : "#{rs.to_i}M"
+        rs = rs % 1 != 0 ? "#{(rs).round(2)}M" : "#{rs.to_i}M"
       else
-        return number % 1 != 0 ? '%.2f' % number : "#{number.to_i}"
+        rs = number % 1 != 0 ? '%.2f' % number : "#{number.to_i}"
     end
+    return rs.gsub('.', ',')
   end
 
+  #################################################
   def get_change_color(change)
     if change < 0
       return "red"
@@ -244,6 +242,146 @@ module SecurityHelpers
     else
       return nil
     end
+  end
+
+  #################################################
+  def get_quotes(symbols, fields, **options)
+    options[:na_as_nil] = true # always nil in case of 'N/A'
+
+    @data = YahooFinance::Client.new.quotes(
+        symbols,
+        fields,
+        options
+    )
+
+    @data.each do |symbol_data|
+      symbol_data.to_h.each do |k,v|
+        if v.nil?
+          symbol_data.delete_field(k)
+          next
+        end
+        symbol_data[k] = get_number_from_string(v)
+      end
+    end
+
+    return @data
+  end
+
+  #################################################
+  def get_last_price(symbols)
+    return get_quotes(symbols, [:last_trade_price])
+  end
+
+  #################################################
+  def get_all_quotes(symbols)
+    data = get_quotes(
+        symbols,
+        [
+            :after_hours_change_real_time                ,
+            :annualized_gain                             ,
+            :ask                                         ,
+            :ask_real_time                               ,
+            :ask_size                                    ,
+            :average_daily_volume                        ,
+            :bid                                         ,
+            :bid_real_time                               ,
+            :bid_size                                    ,
+            :book_value                                  ,
+            :change                                      ,
+            :change_and_percent_change                   ,
+            :change_from_200_day_moving_average          ,
+            :change_from_50_day_moving_average           ,
+            :change_from_52_week_high                    ,
+            :change_From_52_week_low                     ,
+            :change_in_percent                           ,
+            :change_percent_realtime                     ,
+            :change_real_time                            ,
+            :close                                       ,
+            :comission                                   ,
+            :day_value_change                            ,
+            :day_value_change_realtime                   ,
+            :days_range                                  ,
+            :days_range_realtime                         ,
+            :dividend_pay_date                           ,
+            :dividend_per_share                          ,
+            :dividend_yield                              ,
+            :earnings_per_share                          ,
+            :ebitda                                      ,
+            :eps_estimate_current_year                   ,
+            :eps_estimate_next_quarter                   ,
+            :eps_estimate_next_year                      ,
+            :error_indicator                             ,
+            :ex_dividend_date                            ,
+            :float_shares                                ,
+            :high                                        ,
+            :high_52_weeks                               ,
+            :high_limit                                  ,
+            :holdings_gain                               ,
+            :holdings_gain_percent                       ,
+            :holdings_gain_percent_realtime              ,
+            :holdings_gain_realtime                      ,
+            :holdings_value                              ,
+            :holdings_value_realtime                     ,
+            :last_trade_date                             ,
+            :last_trade_price                            ,
+            :last_trade_realtime_withtime                ,
+            :last_trade_size                             ,
+            :last_trade_time                             ,
+            :last_trade_with_time                        ,
+            :low                                         ,
+            :low_52_weeks                                ,
+            :low_limit                                   ,
+            :market_cap_realtime                         ,
+            :market_capitalization                       ,
+            :more_info                                   ,
+            :moving_average_200_day                      ,
+            :moving_average_50_day                       ,
+            :name                                        ,
+            :notes                                       ,
+            :one_year_target_price                       ,
+            :open                                        ,
+            :order_book                                  ,
+            :pe_ratio                                    ,
+            :pe_ratio_realtime                           ,
+            :peg_ratio                                   ,
+            :percent_change_from_200_day_moving_average  ,
+            :percent_change_from_50_day_moving_average   ,
+            :percent_change_from_52_week_high            ,
+            :percent_change_from_52_week_low             ,
+            :previous_close                              ,
+            :price_eps_estimate_current_year             ,
+            :price_eps_Estimate_next_year                ,
+            :price_paid                                  ,
+            :price_per_book                              ,
+            :price_per_sales                             ,
+            :revenue                                     ,
+            :shares_outstanding                          ,
+            :shares_owned                                ,
+            :short_ratio                                 ,
+            :stock_exchange                              ,
+            :symbol                                      ,
+            :ticker_trend                                ,
+            :trade_date                                  ,
+            :trade_links                                 ,
+            :volume                                      ,
+            :weeks_range_52
+        ]
+    )
+
+    data.each do |item|
+      if item.ebitda && item.revenue
+        item[:ebitda_marge] = item.ebitda / item.revenue * 100
+      end
+
+      if item.earnings_per_share && item.shares_outstanding
+        item[:profit] = item.earnings_per_share * item.shares_outstanding
+      end
+    end
+
+    data = get_static_quotes(symbols, data)
+    # data = get_finance_quotes(symbols, data)
+
+    return data
   end
 
 end
