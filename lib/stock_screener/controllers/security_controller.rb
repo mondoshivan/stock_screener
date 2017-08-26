@@ -96,19 +96,25 @@ class SecurityController < Controller
     slim :security
   end
 
-  get '/trade' do
+  get '/:security_id/last-price' do
     logged_in!
+    content_type :json
+
     @security = find_security_with_id(params[:security_id])
+    halt 404 unless @security
 
-    # error condition
-    halt 404, slim(:not_found) unless @security
-
-    # get data
     symbols = [@security.symbol]
-    @data = get_last_price(symbols)
+    @data = get_quotes(
+        symbols,
+        [
+            :change,
+            :change_in_percent,
+            :last_trade_price
+        ]
+    )
     @data = @data[0]
 
-    slim :trade
+    return @data.to_h.to_json
   end
 
   put '/trade' do

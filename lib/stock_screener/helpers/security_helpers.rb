@@ -108,31 +108,36 @@ module SecurityHelpers
           :cash_flow => "https://finance.yahoo.com/quote/#{symbol}/cash-flow"
       }
 
-      Nokogiri::HTML(open(page[page_type])).css('section[data-test="qsp-financial"]').each do |section|
-        data[index][page_type] = Hash.new
+      data[index][page_type] = Hash.new
+      section = Nokogiri::HTML(open(page[page_type])).css('section[data-test="qsp-financial"]')
+      return data if section.nil? || section.empty?
+      section = section[0]
 
-        # {1: '2017', 2: '2016', ...}
-        date = {}
-        (1..4).each do |i|
+      # {1: '2017', 2: '2016', ...}
+      date = {}
+      (1..4).each do |i|
+        begin
           date[i] = section.xpath('div').last.xpath('table/tbody/tr').first.xpath('td')[i].xpath('span').text
           data[index][page_type][date[i]] = {}
+        rescue NoMethodError
         end
+      end
+      return data if date.empty?
 
-        from = 1
-        to = section.xpath('div').last.xpath('table/tbody/tr').size - 1
-        (from..to).each do |i|
-          tr = section.xpath('div').last.xpath('table/tbody/tr')[i]
-          next if tr.xpath('td').size < 2 # at least name and one value should exist
-          name = tr.xpath('td')[0].xpath('span').text.gsub(/[\s\/]/, '_').downcase.to_sym # quote name
-          tr.xpath('td').each_with_index do |td, i|
-            next if i == 0 # this is the name
-            next unless date[i] # more values than dates not excepted
-            value = tr.xpath('td')[i].xpath('span').text.strip
-            next if value == ''
-            multiplier = 1000 # all values are shown in thousands
-            number = get_number_from_string(value) * multiplier
-            data[index][page_type][date[i]][name] = number
-          end
+      from = 1
+      to = section.xpath('div').last.xpath('table/tbody/tr').size - 1
+      (from..to).each do |i|
+        tr = section.xpath('div').last.xpath('table/tbody/tr')[i]
+        next if tr.xpath('td').size < 2 # at least name and one value should exist
+        name = tr.xpath('td')[0].xpath('span').text.gsub(/[\s\/]/, '_').gsub('.','').downcase.to_sym # quote name
+        tr.xpath('td').each_with_index do |td, i|
+          next if i == 0 # this is the name
+          next unless date[i] # more values than dates not excepted
+          value = tr.xpath('td')[i].xpath('span').text.strip
+          next if value == ''
+          multiplier = 1000 # all values are shown in thousands
+          number = get_number_from_string(value) * multiplier
+          data[index][page_type][date[i]][name] = number
         end
       end
     end
@@ -378,7 +383,7 @@ module SecurityHelpers
       end
     end
 
-    data = get_static_quotes(symbols, data)
+    # data = get_static_quotes(symbols, data)
     # data = get_finance_quotes(symbols, data)
 
     return data

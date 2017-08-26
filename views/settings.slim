@@ -17,6 +17,7 @@ form action="/settings/init-symbols" method="post"
 
 form action="/settings/scan" method="post"
   select name="exchange_id"
+    option value="all" all
     - Exchange.all.each do |exchange|
       - next if exchange.name == ''
       option value==exchange.id =exchange.name

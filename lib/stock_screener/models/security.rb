@@ -13,6 +13,7 @@ class Security
   belongs_to :exchange
 
   has n, :income_statements
+  has n, :balance_sheets
 
   # property :revenue, Integer
   # property :gross_profit, Integer

@@ -60,28 +60,43 @@ class SettingsController < Controller
   end
 
   put '/scan' do
-    exchange = Exchange.first(id: params[:exchange_id])
+    exchanges = params[:exchange_id] == 'all' ? Exchange.all : [Exchange.first(id: params[:exchange_id])]
 
     # error condition
-    halt 404, slim(:not_found) unless exchange
+    halt 404, slim(:not_found) if exchanges.none?
 
-    Security.all(exchange: exchange).each do |security|
-      logger.info "Handling: #{security.symbol}"
-      symbols = [security.symbol]
-      data = get_income_statements(symbols)
+    Thread.new do
+      exchanges.each do |exchange|
+        next if exchange.nil?
+        Security.all(exchange: exchange).each do |security|
+          logger.info "Handling: #{security.symbol}"
+          symbols = [security.symbol]
 
-      all = IncomeStatement.all
-      data[0][:income_statement].each do |date, numbers|
-        date = Date.strptime(date, '%m/%d/%Y')
-        next if IncomeStatement.first(security: security, date: date)
-        income_statement = IncomeStatement.new(numbers)
-        income_statement.date = date
-        income_statement.period = IncomeStatement::PERIOD[:yearly]
-        security.income_statements << income_statement
-        security.save
-        income_statement.save
+          get_income_statements(symbols)[0][:income_statement].each do |date, numbers|
+            date = Date.strptime(date, '%m/%d/%Y')
+            next if IncomeStatement.first(security: security, date: date)
+            income_statement = IncomeStatement.new(numbers)
+            income_statement.date = date
+            income_statement.period = IncomeStatement::PERIOD[:yearly]
+            security.income_statements << income_statement
+            security.save
+            income_statement.save
+          end
+
+          get_balance_sheets(symbols)[0][:balance_sheet].each do |date, numbers|
+            date = Date.strptime(date, '%m/%d/%Y')
+            next if BalanceSheet.first(security: security, date: date)
+            balance_sheet = BalanceSheet.new(numbers)
+            balance_sheet.date = date
+            balance_sheet.period = BalanceSheet::PERIOD[:yearly]
+            security.balance_sheets << balance_sheet
+            security.save
+            balance_sheet.save
+          end
+        end
       end
     end
+
     flash[:notice] = "Scan is running in background"
     redirect to('/')
   end

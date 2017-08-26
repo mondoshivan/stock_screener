@@ -1,70 +1,93 @@
-div style="display: block; width: 100%;"
+script src="security.js"
+
+div style="display: block; width: 100%; padding: 5px 0 25px 0;"
   div style="display: inline-block"
     div style=""
-      h1 #{@security.symbol} #{@security.name}
-    div style="" title="Exchange"
-      span #{@security.exchange.name}
+      h1 #{@security.symbol} #{@security.name} (#{@security.exchange.name})
 
-  div style="float: right; text-align: right;"
-    h1 title="Last Trade Price" = get_string_from_number(@data.last_trade_price)
-    h2 class==get_change_color(@data.change_in_percent) title="Change (Change in %)" = get_change()
+  div id="effect" style="float: right; text-align: right;"
+    h1 id="last-price" title="Last Trade Price" = get_string_from_number(@data.last_trade_price)
+    h2 id="changes" class==get_change_color(@data.change_in_percent) title="Change (Change in %)" = get_change()
 
-- if logged_in?
-  #trade
-    a href="/security/trade?security_id=#{@security.id}" trade
+div id="tabs"
+  ul
+    li
+      a href="#tabs-1" Statistics
+    li
+      a href="#tabs-2" Income Statement
+    li
+      a href="#tabs-3" Balance Sheet
+    - if logged_in?
+      li
+        a href="#tabs-4" Trade
 
-#dates style="padding-top: 50px;"
-  #quotes style="width: 50%; display: inline-block; float: left"
-    div class="quote-row"
-      div class="quote-name"
-      div class="quote-name"
-      div class="quote-name" Margin
-      div class="quote-name"
-    div class="quote-row" title="Revenue (trailing 12 month)"
-      div class="quote-name" Revenue (ttm)
-      div class="quote-value" = get_string_from_number(@data.revenue)
-    div class="quote-row" title="Earnings before Interests Tax Depreciation Allowance"
-      div class="quote-name" ebitda
-      div class="quote-value" = get_string_from_number(@data.ebitda)
-      div class="quote-value" = get_string_from_number(@data.ebitda_marge)
-    div class="quote-row" title="Earnings per Share"
-      div class="quote-name" Profit
-      div class="quote-name" = get_string_from_number(@data.profit)
-    div class="quote-row"
-      div class="quote-name" Market Cap
-      div class="quote-name" = get_string_from_number(@data.market_capitalization)
-    div class="quote-row"
-      div class="quote-name" Market Cap Realtime
-      div class="quote-name" = get_string_from_number(@data.market_cap_realtime)
-    div class="quote-row"
-      div class="quote-name" Shares Outstanding
-      div class="quote-name" = get_string_from_number(@data.shares_outstanding)
-    div class="quote-row"
-      div class="quote-name" Shares Floating
-      div class="quote-name" = get_string_from_number(@data.float_shares)
-    div class="quote-row"
-      div class="quote-name" Short Ratio
-      div class="quote-name" = get_string_from_number(@data.short_ratio)
-    div class="quote-row" title="Price Earnings Ratio"
-      div class="quote-name" P/E Ratio
-      div class="quote-name" = get_string_from_number(@data.pe_ratio)
-    div class="quote-row" title="Earnings per Share"
-      div class="quote-name" EPS
-      div class="quote-name" = get_string_from_number(@data.earnings_per_share)
-    div class="quote-row" title="Book Value"
-      div class="quote-name" Book Value
-      div class="quote-name" = get_string_from_number(@data.book_value)
-    div class="quote-row" title="Volume"
-      div class="quote-name" Volume
-      div class="quote-name" = get_string_from_number(@data.volume)
-    div class="quote-row" title="Average Daily Volume"
-      div class="quote-name" Average Daily Volume
-      div class="quote-name" = get_string_from_number(@data.average_daily_volume)
+  div id="tabs-1"
+    #dates style=""
+      #chart style="width: 50%; display: inline;"
+        #chart-indicators style="width: 50%; margin: 0 auto; text-align: center;"
+          - @periods.each do |name, value|
+            a class="indicator #{interval_selected?(name)}" href="/security?security_id=#{params[:security_id]}&period=#{name}" = name
+        == line_chart(@history, min: @min, max: @max, library: settings.google_chart_config)
 
+      #quotes style=""
+        div class="quote-row"
+          div class="quote-name"
+          div class="quote-name"
+          div class="quote-name" Margin
+          div class="quote-name"
+        div class="quote-row" title="Revenue (trailing 12 month)"
+          div class="quote-name" Revenue (ttm)
+          div class="quote-value" = get_string_from_number(@data.revenue)
+        div class="quote-row" title="Earnings before Interests Tax Depreciation Allowance"
+          div class="quote-name" ebitda
+          div class="quote-value" = get_string_from_number(@data.ebitda)
+          div class="quote-value" = get_string_from_number(@data.ebitda_marge)
+        div class="quote-row" title="Earnings per Share"
+          div class="quote-name" Profit
+          div class="quote-name" = get_string_from_number(@data.profit)
+        div class="quote-row"
+          div class="quote-name" Market Cap
+          div class="quote-name" = get_string_from_number(@data.market_capitalization)
+        div class="quote-row"
+          div class="quote-name" Market Cap Realtime
+          div class="quote-name" = get_string_from_number(@data.market_cap_realtime)
+        div class="quote-row"
+          div class="quote-name" Shares Outstanding
+          div class="quote-name" = get_string_from_number(@data.shares_outstanding)
+        div class="quote-row"
+          div class="quote-name" Shares Floating
+          div class="quote-name" = get_string_from_number(@data.float_shares)
+        div class="quote-row"
+          div class="quote-name" Short Ratio
+          div class="quote-name" = get_string_from_number(@data.short_ratio)
+        div class="quote-row" title="Price Earnings Ratio"
+          div class="quote-name" P/E Ratio
+          div class="quote-name" = get_string_from_number(@data.pe_ratio)
+        div class="quote-row" title="Earnings per Share"
+          div class="quote-name" EPS
+          div class="quote-name" = get_string_from_number(@data.earnings_per_share)
+        div class="quote-row" title="Book Value"
+          div class="quote-name" Book Value
+          div class="quote-name" = get_string_from_number(@data.book_value)
+        div class="quote-row" title="Volume"
+          div class="quote-name" Volume
+          div class="quote-name" = get_string_from_number(@data.volume)
+        div class="quote-row" title="Average Daily Volume"
+          div class="quote-name" Average Daily Volume
+          div class="quote-name" = get_string_from_number(@data.average_daily_volume)
 
-  #chart style="width: 50%; display: inline-block; float: left; padding-top: 20px"
-    #chart-indicators style="width: 50%; margin: 0 auto; text-align: center;"
-      - @periods.each do |name, value|
-        a class="indicator #{interval_selected?(name)}" href="/security?security_id=#{params[:security_id]}&period=#{name}" = name
-    == line_chart(@history, min: @min, max: @max, library: settings.google_chart_config)
+  div id="tabs-2"
+    p Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.
+  div id="tabs-3"
+    p Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.
+    p Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.
+  div id="tabs-4"
+    form class="buy" action="/security/trade" method ="post"
+      input type="hidden" name="_method" value="put"
+      input type="hidden" name="security_id" value==@security.id
+      label for="volume" Volume:
+      input class="volume" type="text" name="volume"
+      span class="volume"
+      p
+       button class="buy" Buy
 
