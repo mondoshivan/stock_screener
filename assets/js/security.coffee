@@ -70,14 +70,12 @@ getIncomeStatement = (date) ->
       console.log("AJAX Error: #{textStatus}")
     success: (data, textStatus, jqXHR) ->
       console.log(data)
-      $('#data-income').empty()
 
       skip = ['security_id', 'id', 'period', 'date']
       for name, value of data
         continue if name in skip
         value = if value == null then '' else value
-        $('#data-income').append( "<p>#{name}: #{value}</p>" )
-
+        $("##{name}").text(value)
 
 $ ->
   $('#select-income-date').on "selectmenuchange", (event) ->

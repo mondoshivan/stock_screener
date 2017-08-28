@@ -38,7 +38,7 @@ h1 Search: #{params[:search]}
         div class="table-cell head" Symbol
         div class="table-cell head" Category
       - @securities.each do |security|
-        a class="table-row" href="/security?security_id=#{security.id}"
+        a class="table-row hoover" href="/security?security_id=#{security.id}"
           div class="table-cell" = security.exchange.name
           div class="table-cell" = security.name
           div class="table-cell" = security.symbol

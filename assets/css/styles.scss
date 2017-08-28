@@ -16,6 +16,11 @@ h1 {
   font: 32px/1 $main-font;
 }
 
+h2 {
+  color: $black;
+  font: 26px/1 $main-font;
+}
+
 header {
   margin: 0 auto;
   width: $contentWidth;
@@ -81,22 +86,31 @@ a.indicator.selected {
   border: 1px solid $red;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .table {
   display:table;
-  background-color: $black
+  width: 100%;
+  margin: 10px 10px 10px 10px;
 }
 
 .table-row {
   display:table-row;
   text-decoration: none;
-  color: $white;
+  color: $black;
+}
+
+.table-row.hoover {
   &:hover {
-    background: darken($black, 20%);
+    background: lighten($black, 10%);
   }
 }
 
+
 .table-row.head {
-  background: darken($black, 20%);
+  background: lighten($black, 10%);
 }
 
 .table-cell {

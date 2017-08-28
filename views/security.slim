@@ -1,4 +1,5 @@
 script src="security.js"
+link rel="stylesheet" href="security.css" media="screen, projection"
 
 div style="display: block; width: 100%; padding: 5px 0 25px 0;"
   div style="display: inline-block"
@@ -22,7 +23,7 @@ div id="tabs"
         a href="#tabs-trade" Trade
 
   #tabs-stats
-    #dates style=""
+    #data-stats class="security-content"
       #chart style="width: 50%; display: inline;"
         #chart-indicators style="width: 50%; margin: 0 auto; text-align: center;"
           - @periods.each do |name, value|
@@ -81,17 +82,191 @@ div id="tabs"
       select id="select-income-date" name="date" title="Issued date"
         - @security.income_statements.each_with_index do |income_statement, i|
           option = income_statement.date.strftime("%d.%m.%Y")
-    #data-income
+
+    #data-income class="security-content"
+      div class="security-content"
+        h2 Revenue
+        div class="table"
+          div class="table-row"
+            div class="table-cell"
+              div Total Revenue
+            div class="table-cell"
+              #total_revenue
+          div class="table-row"
+            div class="table-cell"
+              div Cost of Revenue
+            div class="table-cell"
+              #cost_of_revenue
+          div class="table-row"
+            div class="table-cell"
+              div class="bold" Gross Profit
+            div class="table-cell"
+              #gross_profit class="bold"
+
+      div class="security-content"
+        h2 Operating Expenses
+        div class="table"
+          div class="table-row"
+            div class="table-cell"
+              div Research Development
+            div class="table-cell"
+              #research_development
+          div class="table-row"
+            div class="table-cell"
+              div Selling General and Administrative
+            div class="table-cell"
+              #selling_general_and_administrative
+          div class="table-row"
+            div class="table-cell"
+              div Non Recurring
+            div class="table-cell"
+              #non_recurring
+          div class="table-row"
+            div class="table-cell"
+              div Others
+            div class="table-cell"
+              #others
+          div class="table-row"
+            div class="table-cell"
+              div Total Operating Expenses
+            div class="table-cell"
+              #total_operating_expenses
+          div class="table-row"
+            div class="table-cell"
+              div class="bold" Operating Income or Loss
+            div class="table-cell"
+              #operating_income_or_loss class="bold"
+
+      div class="security-content"
+        h2 Income from Continuing Operations
+        div class="table"
+          div class="table-row"
+            div class="table-cell"
+              div Total Other Income/Expenses Net
+            div class="table-cell"
+              #total_other_income_Expenses_net
+          div class="table-row"
+            div class="table-cell"
+              div Earnings Before Interest and Taxes
+            div class="table-cell"
+              #earnings_before_interest_and_taxes
+          div class="table-row"
+            div class="table-cell"
+              div Interest Expense
+            div class="table-cell"
+              #interest_expense
+          div class="table-row"
+            div class="table-cell"
+              div Interest Expense
+            div class="table-cell"
+              #interest_expense
+          div class="table-row"
+            div class="table-cell"
+              div Income Before Tax
+            div class="table-cell"
+              #income_before_tax
+          div class="table-row"
+            div class="table-cell"
+              div Income Tax Expense
+            div class="table-cell"
+              #income_tax_expense
+          div class="table-row"
+            div class="table-cell"
+              div Minority Interest
+            div class="table-cell"
+              #minority_interest
+          div class="table-row"
+            div class="table-cell"
+              div class="bold" Net Income From Continuing Ops
+            div class="table-cell"
+              #net_income_from_continuing_ops class="bold"
+
+      div class="security-content"
+        h2 Non-recurring Events
+        div class="table"
+          div class="table-row"
+            div class="table-cell"
+              div Discontinued Operations
+            div class="table-cell"
+              #discontinued_operations
+          div class="table-row"
+            div class="table-cell"
+              div Extraordinary Items
+            div class="table-cell"
+              #extraordinary_items
+          div class="table-row"
+            div class="table-cell"
+              div Effect Of Accounting Changes
+            div class="table-cell"
+              #effect_of_accounting_changes
+          div class="table-row"
+            div class="table-cell"
+              div Other Items
+            div class="table-cell"
+              #other_items
+
+      div class="security-content"
+        h2 Net Income
+        div class="table"
+          div class="table-row"
+            div class="table-cell"
+              div class="bold" Net Income
+            div class="table-cell"
+              #net_income class="bold"
+          div class="table-row"
+            div class="table-cell"
+              div Preferred Stock And Other Adjustments
+            div class="table-cell"
+              #preferred_stock_and_other_adjustments
+          div class="table-row"
+            div class="table-cell"
+              div class="bold" Net Income Applicable To Common Shares
+            div class="table-cell"
+              #net_income_applicable_to_common_shares class="bold"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   #tabs-balance
-    p Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.
-    p Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.
+    #data-balance class="security-content"
+      p Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.
+      p Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.
   #tabs-trade
-    form class="buy" action="/security/trade" method ="post"
-      input type="hidden" name="_method" value="put"
-      input type="hidden" name="security_id" value==@security.id
-      label for="volume" Volume:
-      input class="volume" type="text" name="volume" title="Volume"
-      span class="volume"
-      p
-        button class="buy" Buy
+    #data-trade class="security-content"
+      form class="buy" action="/security/trade" method ="post"
+        input type="hidden" name="_method" value="put"
+        input type="hidden" name="security_id" value==@security.id
+        label for="volume" Volume:
+        input class="volume" type="text" name="volume" title="Volume"
+        span class="volume"
+        p
+          button class="buy" Buy
 
