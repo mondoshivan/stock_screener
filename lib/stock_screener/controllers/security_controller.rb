@@ -117,6 +117,15 @@ class SecurityController < Controller
     return @data.to_h.to_json
   end
 
+  get '/:security_id/income-statement/:date' do
+    content_type :json
+    @security = find_security_with_id(params[:security_id])
+    halt 404 unless @security
+    date = Date.strptime(params[:date], '%d.%m.%Y')
+    income_statement = @security.income_statements.first(:date => date)
+    return income_statement.to_json
+  end
+
   put '/trade' do
     logged_in!
     @security = find_security_with_id(params[:security_id])

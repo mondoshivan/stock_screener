@@ -12,16 +12,16 @@ div style="display: block; width: 100%; padding: 5px 0 25px 0;"
 div id="tabs"
   ul
     li
-      a href="#tabs-1" Statistics
+      a href="#tabs-stats" Statistics
     li
-      a href="#tabs-2" Income Statement
+      a href="#tabs-income" Income Statement
     li
-      a href="#tabs-3" Balance Sheet
+      a href="#tabs-balance" Balance Sheet
     - if logged_in?
       li
-        a href="#tabs-4" Trade
+        a href="#tabs-trade" Trade
 
-  div id="tabs-1"
+  #tabs-stats
     #dates style=""
       #chart style="width: 50%; display: inline;"
         #chart-indicators style="width: 50%; margin: 0 auto; text-align: center;"
@@ -76,18 +76,22 @@ div id="tabs"
           div class="quote-name" Average Daily Volume
           div class="quote-name" = get_string_from_number(@data.average_daily_volume)
 
-  div id="tabs-2"
-    p Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.
-  div id="tabs-3"
+  #tabs-income
+    form id="get-income"
+      select id="select-income-date" name="date" title="Issued date"
+        - @security.income_statements.each_with_index do |income_statement, i|
+          option = income_statement.date.strftime("%d.%m.%Y")
+    #data-income
+  #tabs-balance
     p Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.
     p Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.
-  div id="tabs-4"
+  #tabs-trade
     form class="buy" action="/security/trade" method ="post"
       input type="hidden" name="_method" value="put"
       input type="hidden" name="security_id" value==@security.id
       label for="volume" Volume:
-      input class="volume" type="text" name="volume"
+      input class="volume" type="text" name="volume" title="Volume"
       span class="volume"
       p
-       button class="buy" Buy
+        button class="buy" Buy
 

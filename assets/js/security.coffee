@@ -1,4 +1,7 @@
 $ ->
+  $( "#select-income-date" ).selectmenu();
+
+$ ->
   $("input.volume").on "input", ->
     volume = $(this).val()
     if isNaN(volume) == false && volume != ''
@@ -54,3 +57,34 @@ $(document).ready ->
             , 1000
 
   , 5000
+
+getIncomeStatement = (date) ->
+  url = new URL(window.location.href)
+  security_id = url.searchParams.get("security_id")
+
+  $.ajax
+    type: 'GET'
+    url: "/security/#{security_id}/income-statement/#{date}"
+    dataType: "json"
+    error: (jqXHR, textStatus, errorThrown) ->
+      console.log("AJAX Error: #{textStatus}")
+    success: (data, textStatus, jqXHR) ->
+      console.log(data)
+      $('#data-income').empty()
+
+      skip = ['security_id', 'id', 'period', 'date']
+      for name, value of data
+        continue if name in skip
+        value = if value == null then '' else value
+        $('#data-income').append( "<p>#{name}: #{value}</p>" )
+
+
+$ ->
+  $('#select-income-date').on "selectmenuchange", (event) ->
+    date = $('#select-income-date').val()
+    getIncomeStatement(date)
+
+$(document).ready ->
+  date = $('#select-income-date').val()
+  getIncomeStatement(date)
+

@@ -5,6 +5,7 @@ group :production, :development do
   gem 'slim'
   gem 'data_mapper'
   gem 'dm-sqlite-adapter'
+  gem 'dm-serializer'
   gem 'sass'
   gem 'yahoo-finance'
   gem 'chartkick'
