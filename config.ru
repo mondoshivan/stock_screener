@@ -20,4 +20,5 @@ map('/settings') { run SettingsController }
 map('/security') { run SecurityController }
 map('/portfolio') { run PortfolioController }
 map('/users') { run UsersController }
+map('/threads') { run ThreadsController }
 map('/') { run StockScreener }

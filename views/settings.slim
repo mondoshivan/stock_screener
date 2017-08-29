@@ -3,17 +3,18 @@ h1 Settings
 - if settings.development?
   form action="/settings/reset-db" method="post"
     input type="hidden" name="_method" value="delete"
-    input type="submit" value="Reset DB"
+    p
+      button Reset DB
 
 form action="/settings/symbols" method="get"
   select name="country"
     - settings.country.each do |symbol, name|
       option value="#{symbol.to_s}" = name
-  input type="submit" value="Get Symbols" title=""
+  button Get Symbols
 
 form action="/settings/init-symbols" method="post"
   input type="hidden" name="_method" value="put"
-  input type="submit" value="Init Symbols"
+  button Init Symbols
 
 form action="/settings/scan" method="post"
   select name="exchange_id"
@@ -22,4 +23,4 @@ form action="/settings/scan" method="post"
       - next if exchange.name == ''
       option value==exchange.id =exchange.name
   input type="hidden" name="_method" value="put"
-  input type="submit" value="Scan"
+  button Report Scan

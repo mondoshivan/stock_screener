@@ -41,6 +41,7 @@ require 'stock_screener/controllers/settings_controller'
 require 'stock_screener/controllers/search_controller'
 require 'stock_screener/controllers/portfolio_controller'
 require 'stock_screener/controllers/users_controller'
+require 'stock_screener/controllers/threads_controller'
 
 # Models
 require 'stock_screener/models/security'

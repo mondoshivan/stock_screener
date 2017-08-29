@@ -35,19 +35,23 @@ class SettingsController < Controller
   end
 
   get '/symbols' do
-    Thread.new do
+    t = Thread.new do
       FileUtils.mkdir_p(settings.data_dir)
       Dir.chdir(settings.data_dir)
       Dir.glob('./stocks.*').each { |file| File.delete(file)}
       logger.info %x{YahooTickerDownloader.py -m #{params[:country]} stocks}
       Dir.chdir(settings.root)
     end
+    t.thread_variable_set(:name, 'Symbol Scan')
+    t.thread_variable_set(:controller, self.class)
+    BACKGROUND_TASKS << t
+    logger.info "background tasks: #{BACKGROUND_TASKS.inspect}"
     flash[:notice] = "Downloading Symbols in Background"
     redirect to('/')
   end
 
   put '/init-symbols' do
-    Thread.new do
+    t= Thread.new do
       Dir.chdir(settings.data_dir)
       pwd = Dir.pwd
       file = 'stocks.yaml'
@@ -55,6 +59,9 @@ class SettingsController < Controller
       Dir.chdir(settings.root)
       initialize_securities(yaml)
     end
+    t.thread_variable_set(:name, 'Initialize Symbols')
+    t.thread_variable_set(:controller, self.class)
+    BACKGROUND_TASKS << t
     flash[:notice] = "Adding Symbols to Database in Background"
     redirect to('/')
   end
@@ -65,7 +72,7 @@ class SettingsController < Controller
     # error condition
     halt 404, slim(:not_found) if exchanges.none?
 
-    Thread.new do
+    t = Thread.new do
       exchanges.each do |exchange|
         next if exchange.nil?
         Security.all(exchange: exchange).each do |security|
@@ -97,7 +104,10 @@ class SettingsController < Controller
       end
     end
 
-    flash[:notice] = "Scan is running in background"
+    t.thread_variable_set(:name, 'Report Scan')
+    t.thread_variable_set(:controller, self.class)
+    BACKGROUND_TASKS << t
+    flash[:notice] = "Report Scan is running in background"
     redirect to('/')
   end
 
