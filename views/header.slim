@@ -19,14 +19,13 @@ div class="center" class="" style="display: block;"
               a class==nav_page_selected?('/threads') href="/threads" Threads
 
     div style="display: inline-block; width: 25%"
-      #search style=""
+      #search class="ui-widget" style="display: inline-block;"
         form action="/search" method="GET"
           - request.env['rack.request.query_hash'].each do |name, value|
             - next if name == 'search'
             input type="hidden" name==name value==value
-          input type="text" name="search" placeholder="Exchange/Symbol/Name/Category"
-          input.button type="submit" value="search"
-      #auth style=""
+          input id="searching" type="text" name="search" placeholder="Symbol"
+      #auth style="display: inline-block;"
         div style=""
           - if session[:logged_in]
             a style="color: white" href="/logout" logout

@@ -63,5 +63,12 @@ class SearchController < Controller
     slim :search
   end
 
+  get '/symbols' do
+    content_type :json
+
+    symbols = ['VOW.DE', 'VOW3.DE']
+    return symbols.to_json
+  end
+
 
 end
