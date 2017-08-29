@@ -119,9 +119,18 @@ class SecurityController < Controller
 
   get '/:security_id/income-statement/:date' do
     content_type :json
+
     @security = find_security_with_id(params[:security_id])
     halt 404 unless @security
-    date = Date.strptime(params[:date], '%d.%m.%Y')
+    halt 404 unless params[:date]
+    halt 404 if params[:date].downcase == 'null'
+
+    begin
+      date = Date.strptime(params[:date], '%d.%m.%Y')
+    rescue ArgumentError
+      halt 404
+    end
+
     income_statement = @security.income_statements.first(:date => date)
     return income_statement.to_json
   end

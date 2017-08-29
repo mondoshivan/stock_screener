@@ -44,7 +44,7 @@ module SecurityHelpers
 
   #################################################
   def find_security_with_id(id)
-    return Security.first(id: id.to_i)
+    return id.nil? ? nil : Security.first(id: id.to_i)
   end
 
   #################################################
@@ -57,7 +57,8 @@ module SecurityHelpers
     array.each do |hash|
 
       # only add, if it does not already exist
-      next if !Security.first(symbol: hash["Ticker"]).nil?
+      security_exists = !Security.first(symbol: hash["Ticker"]).nil?
+      next if security_exists
 
       # add
       sec = Security.create(

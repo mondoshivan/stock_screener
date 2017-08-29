@@ -59,6 +59,7 @@ $(document).ready ->
   , 5000
 
 getIncomeStatement = (date) ->
+  return if date == null
   url = new URL(window.location.href)
   security_id = url.searchParams.get("security_id")
 
