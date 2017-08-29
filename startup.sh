@@ -2,7 +2,7 @@
 
 if [ "$APP_ENV" == "production" ]; then
   bundle install --with production
-  ruby $APP_FILE -p 80 -e production
+  rackup $APP_FILE -p 4567 -E production
 else
   if [ "$APP_ENV" == "test" ]; then
     bundle install --with test
