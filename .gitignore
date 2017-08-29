@@ -1,6 +1,7 @@
 /Gemfile.lock
 /stock_screener.iml
 /development.db
+/production.db
 /test.db
 /.idea
 /.sass-cache
