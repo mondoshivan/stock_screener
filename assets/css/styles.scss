@@ -6,6 +6,11 @@ $contentWidth: 1000px;
 body {
   margin: 0;
   font-family: $main-font;
+
+  background-color: #fff;
+  background-image: url('images/texture.png');
+  background-size: 20%;
+  background-repeat: repeat;
 }
 
 h1 {
@@ -19,9 +24,18 @@ h2 {
 }
 
 header {
+  position: relative;
   margin: 0 auto;
   width: $contentWidth;
-  background-color: $black;
+  height: 100px;
+
+}
+
+#header-background {
+  background-image: url('images/header.jpg');
+  background-repeat: no-repeat;
+  width: $contentWidth;
+  height: 100px;
 }
 
 header h1 {
@@ -31,20 +45,57 @@ header h1 {
   padding-left: 84px;
 }
 
+#search {
+  position: absolute;
+  right: 25px;
+  top: 40px;
+}
+
+#search input {
+  width: 150px;
+  height: 30px;
+  margin: 0;
+}
+
+#magnifier {
+  position: absolute;
+  top: 45px;
+  right: 30px;
+  background-image: url("images/magnifier.png");
+  background-repeat: no-repeat;
+  width: 25px;
+  height: 23px;
+}
+
+#auth {
+  position: absolute;
+  right: 30px;
+  top: 10px;
+}
+
 @mixin tabs ($background: blue, $color: yellow) {
   ul {
     list-style: none;
     margin: 0;
     padding: 0;
-    background: $background;
+
     overflow: hidden;
   }
   li {
     float: left;
+    margin: 0 5px 0 5px;
+    border-width: 1px 1px 0 1px;
+    border-color: $black;
+    border-style: dotted;
   }
   a{
-    text-decoration: none; display: block;
-    padding: 8px; background: $background; color: $color;
+    display: block;
+    text-decoration: none;
+    padding: 15px;
+    background: $background;
+    color: $color;
+    font-weight: 500;
+
     &:hover {
       background: darken($background, 20%);
     }
@@ -52,12 +103,14 @@ header h1 {
 }
 
 nav {
-  @include tabs ($background: $black, $color: $white);
+  @include tabs ($background: $darkblue, $color: $white);
   font-weight: bold;
+  position: absolute;
+  bottom: 0;
 }
 
 nav a.selected {
-  background: lighten($black, 5%);
+  background: lighten($darkblue, 10%);
 }
 
 p {

@@ -1,34 +1,35 @@
 div class="center" class="" style="display: block;"
   div class="" style="display: block; width: 100%"
-    div style="display: inline-block; width: 75%"
-      nav
-        ul
+    #header-background
+    nav
+      ul
+        li
+          a class==nav_page_selected?('/') href="/" Home
+        li
+          a class==nav_page_selected?('/search') href="/search" Search
+        - if logged_in?
           li
-            a class==nav_page_selected?('/') href="/" Home
+            a class==nav_page_selected?('/portfolio') href="/portfolio" Portfolio
+        - if authorized?
           li
-            a class==nav_page_selected?('/search') href="/search" Search
-          - if logged_in?
-            li
-              a class==nav_page_selected?('/portfolio') href="/portfolio" Portfolio
-          - if authorized?
-            li
-              a class==nav_page_selected?('/users') href="/users" Users
-            li
-              a class==nav_page_selected?('/settings') href="/settings" Settings
-            li
-              a class==nav_page_selected?('/threads') href="/threads" Threads
+            a class==nav_page_selected?('/users') href="/users" Users
+          li
+            a class==nav_page_selected?('/settings') href="/settings" Settings
+          li
+            a class==nav_page_selected?('/threads') href="/threads" Threads
 
-    div style="display: inline-block; width: 25%"
-      #search class="ui-widget" style="display: inline-block;"
-        form action="/search" method="GET"
-          - request.env['rack.request.query_hash'].each do |name, value|
-            - next if name == 'search'
-            input type="hidden" name==name value==value
-          input id="searching" type="text" name="search" placeholder="Symbol"
-      #auth style="display: inline-block;"
-        div style=""
-          - if session[:logged_in]
-            a style="color: white" href="/logout" logout
-          - else
-            a style="color: white; padding-right: 10px" href="/login" login
-            a style="color: white" href="/register" register
+
+    #search class="ui-widget" style=""
+      form action="/search" method="GET"
+        - request.env['rack.request.query_hash'].each do |name, value|
+          - next if name == 'search'
+          input type="hidden" name==name value==value
+        input id="searching" type="text" name="search" placeholder="Search" maxlength="12"
+    #magnifier
+    #auth style="display: inline-block;"
+      div style=""
+        - if session[:logged_in]
+          a style="color: white" href="/logout" logout
+        - else
+          a style="color: white; padding-right: 10px" href="/login" login
+          a style="color: white" href="/register" register
