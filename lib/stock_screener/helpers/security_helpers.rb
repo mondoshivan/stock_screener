@@ -1,12 +1,12 @@
 module SecurityHelpers
 
   #################################################
-  # Checks if a given symbol exists.
+  # Checks if a given ticker exists.
   # * *Args*    :
-  #   - +symbol+ -> symbol string
+  #   - +ticker+ -> ticker string
   #
-  def security_exists?(symbol)
-    return !Security.first(symbol: symbol).nil?
+  def security_exists?(ticker)
+    return !Security.first(ticker: ticker).nil?
   end
 
   #################################################
@@ -32,7 +32,7 @@ module SecurityHelpers
         hits << security
       elsif security.name.upcase.include?(string)
         hits << security
-      elsif security.symbol.upcase.include?(string)
+      elsif security.ticker.name.upcase.include?(string)
         hits << security
       elsif security.category.name.upcase.include?(string)
         hits << security
@@ -57,7 +57,7 @@ module SecurityHelpers
     array.each do |hash|
 
       # only add, if it does not already exist
-      security_exists = !Security.first(symbol: hash["Ticker"]).nil?
+      security_exists = !Security.first(ticker: hash["Ticker"]).nil?
       next if security_exists
 
       # add
@@ -65,15 +65,15 @@ module SecurityHelpers
           exchange: Exchange.first_or_create(name: hash["Exchange"]),
           category: Category.first_or_create(name: hash["categoryName"]),
           name: hash["Name"],
-          symbol: hash["Ticker"]
+          ticker: Ticker.first_or_create(name: hash["Ticker"])
       )
     end
   end
 
   #################################################
-  def get_static_quotes(symbols, data=[OpenStruct.new])
-    symbols.each_with_index do |symbol, index|
-      Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{symbol}/key-statistics")).xpath('//table[starts-with(@class, "table-qsp-stats")]/tbody/tr').each do |row|
+  def get_static_quotes(tickers, data=[OpenStruct.new])
+    tickers.each_with_index do |ticker, index|
+      Nokogiri::HTML(open("https://finance.yahoo.com/quote/#{ticker}/key-statistics")).xpath('//table[starts-with(@class, "table-qsp-stats")]/tbody/tr').each do |row|
         name = row.xpath('td').first.xpath('span').text.strip.downcase.gsub(' ', '_').to_sym
         value = row.xpath('td').last.text.strip
         next if value.upcase == 'N/A'
@@ -85,28 +85,28 @@ module SecurityHelpers
   end
 
   #################################################
-  def get_income_statements(symbols, data=[OpenStruct.new])
-    return get_finance_quotes(:income_statement, symbols, data=[OpenStruct.new])
+  def get_income_statements(tickers, data=[OpenStruct.new])
+    return get_finance_quotes(:income_statement, tickers, data=[OpenStruct.new])
   end
 
   #################################################
-  def get_balance_sheets(symbols, data=[OpenStruct.new])
-    return get_finance_quotes(:balance_sheet, symbols, data=[OpenStruct.new])
+  def get_balance_sheets(tickers, data=[OpenStruct.new])
+    return get_finance_quotes(:balance_sheet, tickers, data=[OpenStruct.new])
   end
 
   #################################################
-  def get_cash_flows(symbols, data=[OpenStruct.new])
-    return get_finance_quotes(:cash_flow, symbols, data=[OpenStruct.new])
+  def get_cash_flows(tickers, data=[OpenStruct.new])
+    return get_finance_quotes(:cash_flow, tickers, data=[OpenStruct.new])
   end
 
   #################################################
-  def get_finance_quotes(page_type, symbols, data=[OpenStruct.new])
-    symbols.each_with_index do |symbol, index|
+  def get_finance_quotes(page_type, tickers, data=[OpenStruct.new])
+    tickers.each_with_index do |ticker, index|
 
       page = {
-          :income_statement => "https://finance.yahoo.com/quote/#{symbol}/financials",
-          :balance_sheet => "https://finance.yahoo.com/quote/#{symbol}/balance-sheet",
-          :cash_flow => "https://finance.yahoo.com/quote/#{symbol}/cash-flow"
+          :income_statement => "https://finance.yahoo.com/quote/#{ticker}/financials",
+          :balance_sheet => "https://finance.yahoo.com/quote/#{ticker}/balance-sheet",
+          :cash_flow => "https://finance.yahoo.com/quote/#{ticker}/cash-flow"
       }
 
       data[index][page_type] = Hash.new
@@ -149,12 +149,12 @@ module SecurityHelpers
   #################################################
   # Get the history of a security.
   # * *Args*    :
-  #   - +symbol+ -> the symbol of the security
+  #   - +ticker+ -> the ticker of the security
   #   - +number_of_days+ -> how far do we look in the past (0 = forever)
   # * *Returns* :
   #   - hash {date=>value}: {'2017-08-08' => 15.16, ...}
   #
-  def get_history(symbol, number_of_days)
+  def get_history(ticker, number_of_days)
     data = {}
     case true
       when number_of_days == 0
@@ -171,7 +171,7 @@ module SecurityHelpers
 
     start = number_of_days == 0 ? Time.new(1980).to_i : Time.now().to_i - number_of_days * 24 * 60 * 60
     stop = Time.now.to_i
-    url = "https://finance.yahoo.com/quote/#{symbol.strip}/history?interval=#{interval}&period1=#{start}&period2=#{stop}"
+    url = "https://finance.yahoo.com/quote/#{ticker.strip}/history?interval=#{interval}&period1=#{start}&period2=#{stop}"
     page = Nokogiri::HTML(open(url))
     page.css('table')[1].css('tbody').css('tr').each do |row|
       divs = row.css('td')
@@ -251,22 +251,22 @@ module SecurityHelpers
   end
 
   #################################################
-  def get_quotes(symbols, fields, **options)
+  def get_quotes(tickers, fields, **options)
     options[:na_as_nil] = true # always nil in case of 'N/A'
 
     @data = YahooFinance::Client.new.quotes(
-        symbols,
+        tickers,
         fields,
         options
     )
 
-    @data.each do |symbol_data|
-      symbol_data.to_h.each do |k,v|
+    @data.each do |ticker_data|
+      ticker_data.to_h.each do |k,v|
         if v.nil?
-          symbol_data.delete_field(k)
+          ticker_data.delete_field(k)
           next
         end
-        symbol_data[k] = get_number_from_string(v)
+        ticker_data[k] = get_number_from_string(v)
       end
     end
 
@@ -274,14 +274,14 @@ module SecurityHelpers
   end
 
   #################################################
-  def get_last_price(symbols)
-    return get_quotes(symbols, [:last_trade_price])
+  def get_last_price(tickers)
+    return get_quotes(tickers, [:last_trade_price])
   end
 
   #################################################
-  def get_all_quotes(symbols)
+  def get_all_quotes(tickers)
     data = get_quotes(
-        symbols,
+        tickers,
         [
             :after_hours_change_real_time                ,
             :annualized_gain                             ,
@@ -365,7 +365,7 @@ module SecurityHelpers
             :shares_owned                                ,
             :short_ratio                                 ,
             :stock_exchange                              ,
-            :symbol                                      ,
+            :ticker                                      ,
             :ticker_trend                                ,
             :trade_date                                  ,
             :trade_links                                 ,
@@ -384,8 +384,8 @@ module SecurityHelpers
       end
     end
 
-    # data = get_static_quotes(symbols, data)
-    # data = get_finance_quotes(symbols, data)
+    # data = get_static_quotes(tickers, data)
+    # data = get_finance_quotes(tickers, data)
 
     return data
   end

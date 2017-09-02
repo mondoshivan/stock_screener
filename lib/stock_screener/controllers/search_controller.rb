@@ -63,11 +63,11 @@ class SearchController < Controller
     slim :search
   end
 
-  get '/symbols' do
+  get '/tickers' do
     content_type :json
-
-    symbols = ['VOW.DE', 'VOW3.DE']
-    return symbols.to_json
+    tickers = []
+    Ticker.all(:fields => [:name], :order => [ :name.asc ]).each { |ticker| tickers << ticker.name }
+    return tickers.to_json
   end
 
 

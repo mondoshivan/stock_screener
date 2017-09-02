@@ -6,15 +6,15 @@ h1 Settings
     p
       button Reset DB
 
-form action="/settings/symbols" method="get"
+form action="/settings/tickers" method="get"
   select name="country"
-    - settings.country.each do |symbol, name|
-      option value="#{symbol.to_s}" = name
-  button Get Symbols
+    - settings.country.each do |ticker, name|
+      option value="#{ticker.to_s}" = name
+  button Get Tickers
 
-form action="/settings/init-symbols" method="post"
+form action="/settings/init-tickers" method="post"
   input type="hidden" name="_method" value="put"
-  button Init Symbols
+  button Init Tickers
 
 form action="/settings/scan" method="post"
   select name="exchange_id"

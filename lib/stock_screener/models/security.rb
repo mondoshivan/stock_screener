@@ -7,8 +7,8 @@ class Security
 
   property :id, Serial
   property :name, String
-  property :symbol, String
 
+  belongs_to :ticker
   belongs_to :category
   belongs_to :exchange
 

@@ -34,7 +34,7 @@ class SettingsController < Controller
     redirect to('/')
   end
 
-  get '/symbols' do
+  get '/tickers' do
     t = Thread.new do
       FileUtils.mkdir_p(settings.data_dir)
       Dir.chdir(settings.data_dir)
@@ -42,15 +42,15 @@ class SettingsController < Controller
       logger.info %x{YahooTickerDownloader.py -m #{params[:country]} stocks}
       Dir.chdir(settings.root)
     end
-    t.thread_variable_set(:name, 'Symbol Scan')
+    t.thread_variable_set(:name, 'Ticker Scan')
     t.thread_variable_set(:controller, self.class)
     BACKGROUND_TASKS << t
     logger.info "background tasks: #{BACKGROUND_TASKS.inspect}"
-    flash[:notice] = "Downloading Symbols in Background"
+    flash[:notice] = "Downloading Tickers in Background"
     redirect to('/')
   end
 
-  put '/init-symbols' do
+  put '/init-tickers' do
     t= Thread.new do
       Dir.chdir(settings.data_dir)
       pwd = Dir.pwd
@@ -59,10 +59,11 @@ class SettingsController < Controller
       Dir.chdir(settings.root)
       initialize_securities(yaml)
     end
-    t.thread_variable_set(:name, 'Initialize Symbols')
+
+    t.thread_variable_set(:name, 'Initialize Tickers')
     t.thread_variable_set(:controller, self.class)
     BACKGROUND_TASKS << t
-    flash[:notice] = "Adding Symbols to Database in Background"
+    flash[:notice] = "Adding Tickers to Database in Background"
     redirect to('/')
   end
 
@@ -76,10 +77,10 @@ class SettingsController < Controller
       exchanges.each do |exchange|
         next if exchange.nil?
         Security.all(exchange: exchange).each do |security|
-          logger.info "Handling: #{security.symbol}"
-          symbols = [security.symbol]
+          logger.info "Handling: #{security.ticker.name}"
+          tickers = [security.ticker.name]
 
-          get_income_statements(symbols)[0][:income_statement].each do |date, numbers|
+          get_income_statements(tickers)[0][:income_statement].each do |date, numbers|
             date = Date.strptime(date, '%m/%d/%Y')
             next if IncomeStatement.first(security: security, date: date)
             income_statement = IncomeStatement.new(numbers)
@@ -90,7 +91,7 @@ class SettingsController < Controller
             income_statement.save
           end
 
-          get_balance_sheets(symbols)[0][:balance_sheet].each do |date, numbers|
+          get_balance_sheets(tickers)[0][:balance_sheet].each do |date, numbers|
             date = Date.strptime(date, '%m/%d/%Y')
             next if BalanceSheet.first(security: security, date: date)
             balance_sheet = BalanceSheet.new(numbers)

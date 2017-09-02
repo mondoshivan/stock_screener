@@ -15,8 +15,8 @@ class PortfolioController < Controller
 
     @changes = {}
     @portfolio.each do |item|
-      symbols = [item.security.symbol]
-      @data = get_last_price(symbols)
+      tickers = [item.security.ticker.name]
+      @data = get_last_price(tickers)
       @data = @data[0]
       change = @data.last_trade_price - item.price
       change_in_percent = change / item.price * 100

@@ -71,8 +71,8 @@ class SecurityController < Controller
     halt 404, slim(:not_found) unless @security
 
     # get data
-    symbols = [@security.symbol]
-    @data = get_all_quotes(symbols)[0]
+    tickers = [@security.ticker.name]
+    @data = get_all_quotes(tickers)[0]
     @data.to_h.each {|k,v| logger.info "#{k}: #{v}"}
 
     # get history
@@ -85,7 +85,7 @@ class SecurityController < Controller
 
     default = @periods['1Y']
     @history = get_history(
-        @security.symbol,
+        @security.ticker.name,
         @periods[params[:period]] || default
     )
 
@@ -103,9 +103,9 @@ class SecurityController < Controller
     @security = find_security_with_id(params[:security_id])
     halt 404 unless @security
 
-    symbols = [@security.symbol]
+    tickers = [@security.ticker.name]
     @data = get_quotes(
-        symbols,
+        tickers,
         [
             :change,
             :change_in_percent,
@@ -143,8 +143,8 @@ class SecurityController < Controller
     halt 404, slim(:not_found) unless @security
     halt 422, slim(:unprocessable) unless params[:volume].to_i != 0
 
-    symbols = [@security.symbol]
-    @data = get_last_price(symbols)
+    tickers = [@security.ticker.name]
+    @data = get_last_price(tickers)
     @data = @data[0]
 
     Item.create(

@@ -4,7 +4,7 @@ link rel="stylesheet" href="security.css" media="screen, projection"
 div style="display: block; width: 100%; padding: 5px 0 30px 0;"
   div style="display: inline-block"
     div style=""
-      h1 #{@security.symbol} #{@security.name} (#{@security.exchange.name})
+      h1 #{@security.ticker.name} #{@security.name} (#{@security.exchange.name})
 
   div id="effect" style="float: right; text-align: right;"
     h1 id="last-price" title="Last Trade Price" = get_string_from_number(@data.last_trade_price)

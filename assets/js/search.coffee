@@ -3,7 +3,7 @@ $(document).ready ->
 
   $.ajax
     type: 'GET'
-    url: "/search/symbols"
+    url: "/search/tickers"
     dataType: "json"
     error: (jqXHR, textStatus, errorThrown) ->
       console.log("AJAX Error: #{textStatus}")
