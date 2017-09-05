@@ -4,6 +4,10 @@ $ ->
   dialog_width = $('#content').width() * 0.8
   $( "#dialog" ).dialog({autoOpen: false, width: dialog_width});
   $( "#dialog-tabs" ).tabs();
+  $( "#select-category" ).selectmenu();
+  $( "#select-exchange" ).selectmenu();
+  $( "#select-hits" ).selectmenu();
+
 
 $(document).ready ->
   $.ajax
@@ -29,7 +33,7 @@ $(document).on "click",".dialog-item", (event) ->
     for attribute_type, attr_values of group_values.attributes
       if attr_values.name == attribute_name
         name = attr_values.name
-        $('#attributes-added').append('<div class="attribute-row"><button class="remove-attribute">-</button><input name="attr_'+attribute_type+'_min" placeholder="min"><span>'+name+'</span><input name="attr_'+attribute_type+'_max" placeholder="max"></div>')
+        $('#attributes-added').append('<div class="attribute-row"><button class="remove-attribute" title="Remove the Attribute">-</button><input name="attr_'+attribute_type+'_min" placeholder="min"><span>'+name+'</span><input name="attr_'+attribute_type+'_max" placeholder="max"></div>')
         $( "#dialog" ).dialog( "close" );
         $('button.remove-attribute').button()
         return

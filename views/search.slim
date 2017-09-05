@@ -1,13 +1,12 @@
 script src="search.js"
 link rel="stylesheet" href="search.css" media="screen, projection"
 
-h1 Search: #{params[:search]}
-
 #query
   form id="query-form" action="/search" method="get"
+
     #category-query
       label for="category" Category
-      select name="category"
+      select id="select-category" name="category"
         option value="all" All
         - Category.all.each do |category|
           - if category.name == ''
@@ -15,7 +14,7 @@ h1 Search: #{params[:search]}
           option value==category.id selected==category_selected?(category) = category.name
     #exchange-query
       label for="exchange" Exchange
-      select name="exchange"
+      select id="select-exchange" name="exchange"
         option value="all" All
         - Exchange.all.each do |exchange|
           - if exchange.name == ''
@@ -23,23 +22,22 @@ h1 Search: #{params[:search]}
           option value==exchange.id selected==exchange_selected?(exchange) = exchange.name
     #hitsperpage
       label for="hits" Hits
-      select name="hits"
+      select id="select-hits" name="hits"
         -settings.hits.each do |hits|
           option value==hits selected==hits_selected?(hits) = hits
 
     #attributes
       #attributes-title
         h2 Attributes
-        button id="add-attribute" +
+        button id="add-attribute" title="Add a new Attribute" +
       #attributes-added
         - @attributes.each do |symbol, values|
           div class="attribute-row"
-            button class="remove-attribute" -
+            button class="remove-attribute" title="Remove the Attribute" -
             input name="attr_#{symbol}_min" placeholder="min" value= get_string_from_number(values[:min])
             span = values[:name]
             input name="attr_#{symbol}_max" placeholder="max" value= get_string_from_number(values[:max])
 
-    input type="hidden" name="search" value="#{params[:search]}"
     button Search
 
 #results
@@ -63,7 +61,8 @@ h1 Search: #{params[:search]}
         a class="indicator #{table_page_selected?(page)}" href==page_indicator_href(page) = ticker
 
   #statistics
-    p Total: #{@total}
+    - unless @securities.empty?
+      p Total: #{@total}
 
 #dialog
   #dialog-tabs
