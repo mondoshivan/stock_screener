@@ -65,10 +65,15 @@ class SearchController < Controller
 
   get '/tickers' do
     content_type :json
+
     tickers = []
-    Ticker.all(:fields => [:name], :order => [ :name.asc ]).each { |ticker| tickers << ticker.name }
+    Ticker.all(
+        :name.like => "%#{params[:input]}%",
+        :fields => [:name],
+        :order => [ :name.asc ]
+    ).each { |ticker| tickers << ticker.name }
+
     return tickers.to_json
   end
-
 
 end
