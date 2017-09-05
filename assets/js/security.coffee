@@ -1,5 +1,6 @@
 $ ->
   $( "#select-income-date" ).selectmenu();
+  $( "#select-balance-date" ).selectmenu();
 
 $ ->
   $("input.volume").on "input", ->
@@ -70,6 +71,24 @@ getIncomeStatement = (date) ->
     error: (jqXHR, textStatus, errorThrown) ->
       console.log("AJAX Error: #{textStatus}")
     success: (data, textStatus, jqXHR) ->
+      skip = ['security_id', 'id', 'period', 'date']
+      for name, value of data
+        continue if name in skip
+        value = if value == null then '' else value
+        $("##{name}").text(value)
+
+getBalanceSheet = (date) ->
+  return if date == null
+  url = new URL(window.location.href)
+  security_id = url.searchParams.get("security_id")
+
+  $.ajax
+    type: 'GET'
+    url: "/security/#{security_id}/balance-sheet/#{date}"
+    dataType: "json"
+    error: (jqXHR, textStatus, errorThrown) ->
+      console.log("AJAX Error: #{textStatus}")
+    success: (data, textStatus, jqXHR) ->
       console.log(data)
 
       skip = ['security_id', 'id', 'period', 'date']
@@ -83,7 +102,14 @@ $ ->
     date = $('#select-income-date').val()
     getIncomeStatement(date)
 
+$ ->
+  $('#select-balance-date').on "selectmenuchange", (event) ->
+    date = $('#select-balance-date').val()
+    getBalanceSheet(date)
+
 $(document).ready ->
   date = $('#select-income-date').val()
   getIncomeStatement(date)
 
+  date = $('#select-balance-date').val()
+  getBalanceSheet(date)

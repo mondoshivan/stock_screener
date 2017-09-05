@@ -1,0 +1,41 @@
+@import 'variables';
+
+.attribute-row span {
+  display: inline-block;
+  width: 200px;
+  text-align: center;
+}
+
+.dialog-item {
+  margin: 5px 0 5px 0;
+  width: 50%;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#attributes {
+  margin: 25px 0 25px 0;
+}
+
+#attributes-title {
+  position: relative;
+  margin: 0 0 15px 0;
+}
+
+#attributes h2 {
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+
+#add-attribute {
+  position: absolute;
+  top: 2px;
+
+  # width: 30px;
+  padding: 1px 5px;
+}
+
+#statistics {
+  margin: 25px 0 25px 0;
+}

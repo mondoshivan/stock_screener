@@ -226,47 +226,90 @@ div id="tabs"
                   div class="bold" Net Income Applicable To Common Shares
                 div class="table-cell"
                   #net_income_applicable_to_common_shares class="bold"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   #tabs-balance
-    #data-balance class="security-content"
-      - if @security.balance_sheets.size == 0
-        h2 No Balance Sheets available for this Security
-      - else
-        p Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.
-        p Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.
+    - if @security.balance_sheets.size == 0
+      h2 No Balance Sheets available for this Security
+    - else
+      form id="get-balance"
+        select id="select-balance-date" name="date" title="Issued date"
+          - @security.balance_sheets.each_with_index do |balance_sheet, i|
+            option = balance_sheet.date.strftime("%d.%m.%Y")
+        #data-balance class="security-content"
+          div class="security-content"
+            h2 Current Assets
+            div class="table"
+              div class="table-row"
+                div class="table-cell"
+                  div Cash And Cash Equivalents
+                div class="table-cell"
+                  #cash_and_cash_equivalents
+              div class="table-row"
+                div class="table-cell"
+                  div Short Term Investments
+                div class="table-cell"
+                  #short_term_investments
+              div class="table-row"
+                div class="table-cell"
+                  div Net Receivables
+                div class="table-cell"
+                  #net_receivables
+              div class="table-row"
+                div class="table-cell"
+                  div Inventory
+                div class="table-cell"
+                  #inventory
+              div class="table-row"
+                div class="table-cell"
+                  div Other Current Assets
+                div class="table-cell"
+                  #other_current_assets
+              div class="table-row"
+                div class="table-cell"
+                  div class="bold" Total Current Assets
+                div class="table-cell"
+                  #total_current_assets class="bold"
+          div class="security-content"
+            div class="table"
+              div class="table-row"
+                div class="table-cell"
+                  div Long Term Investments
+                div class="table-cell"
+                  #long_term_investments
+              div class="table-row"
+                div class="table-cell"
+                  div Property Plant and Equipment
+                div class="table-cell"
+                  #property_plant_and_equipment
+              div class="table-row"
+                div class="table-cell"
+                  div Goodwill
+                div class="table-cell"
+                  #goodwill
+              div class="table-row"
+                div class="table-cell"
+                  div Intangible Assets
+                div class="table-cell"
+                  #intangible_assets
+              div class="table-row"
+                div class="table-cell"
+                  div Accumulated Amortization
+                div class="table-cell"
+                  #accumulated_amortization
+              div class="table-row"
+                div class="table-cell"
+                  div Other Assets
+                div class="table-cell"
+                  #other_assets
+              div class="table-row"
+                div class="table-cell"
+                  div Deferred Long Term Asset Charges
+                div class="table-cell"
+                  #deferred_long_term_asset_charges
+              div class="table-row"
+                div class="table-cell"
+                  div class="bold" Total Assets
+                div class="table-cell"
+                  #total_assets class="bold"
   #tabs-trade
     #data-trade class="security-content"
       form class="buy" action="/security/trade" method ="post"

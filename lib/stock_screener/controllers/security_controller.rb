@@ -135,6 +135,24 @@ class SecurityController < Controller
     return income_statement.to_json
   end
 
+  get '/:security_id/balance-sheet/:date' do
+    content_type :json
+
+    @security = find_security_with_id(params[:security_id])
+    halt 404 unless @security
+    halt 404 unless params[:date]
+    halt 404 if params[:date].downcase == 'null'
+
+    begin
+      date = Date.strptime(params[:date], '%d.%m.%Y')
+    rescue ArgumentError
+      halt 404
+    end
+
+    balance_sheet = @security.balance_sheets.first(:date => date)
+    return balance_sheet.to_json
+  end
+
   put '/trade' do
     logged_in!
     @security = find_security_with_id(params[:security_id])

@@ -1,7 +1,10 @@
+script src="search.js"
+link rel="stylesheet" href="search.css" media="screen, projection"
+
 h1 Search: #{params[:search]}
 
 #query
-  form action="/search" method="get"
+  form id="query-form" action="/search" method="get"
     #category-query
       label for="category" Category
       select name="category"
@@ -24,13 +27,23 @@ h1 Search: #{params[:search]}
         -settings.hits.each do |hits|
           option value==hits selected==hits_selected?(hits) = hits
 
+    #attributes
+      #attributes-title
+        h2 Attributes
+        button id="add-attribute" +
+      #attributes-added
+        - @attributes.each do |symbol, values|
+          div class="attribute-row"
+            button class="remove-attribute" -
+            input name="attr_#{symbol}_min" placeholder="min" value= get_string_from_number(values[:min])
+            span = values[:name]
+            input name="attr_#{symbol}_max" placeholder="max" value= get_string_from_number(values[:max])
+
     input type="hidden" name="search" value="#{params[:search]}"
-    input type="submit" value="Search"
+    button Search
 
 #results
-  - if @securities.empty?
-    p No search results found!
-  - else
+  - unless @securities.empty?
     div class="table" style="width: 100%"
       div class="table-row head"
         div class="table-cell head" Exchange
@@ -49,4 +62,19 @@ h1 Search: #{params[:search]}
       - @indicators.each do |ticker, page|
         a class="indicator #{table_page_selected?(page)}" href==page_indicator_href(page) = ticker
 
-  p Total: #{@total}
+  #statistics
+    p Total: #{@total}
+
+#dialog
+  #dialog-tabs
+    ul id="dialog-ul"
+      - settings.attribute_types.each_with_index do |(group_type, group_values), i|
+        li
+          a href="#tab-#{i}" = group_values[:name]
+
+    - settings.attribute_types.each_with_index do |(group_type, group_values), i|
+      div id="tab-#{i}"
+        - group_values[:attributes].each do |attribute_type, attr_values|
+          div class="dialog-item" = attr_values[:name]
+
+
