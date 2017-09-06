@@ -86,146 +86,18 @@ div id="tabs"
           - @security.income_statements.each_with_index do |income_statement, i|
             option = income_statement.date.strftime("%d.%m.%Y")
 
-        #data-income class="security-content"
-          div class="security-content"
-            h2 Revenue
-            div class="table"
+    #data-income class="security-content"
+      - settings.income_statement_groups.each do |group_name, properties|
+        div class="security-content"
+          h2 = sym_to_string(group_name)
+          div class="table"
+            - properties.each do |property|
               div class="table-row"
                 div class="table-cell"
-                  div Total Revenue
+                  div = sym_to_string(property)
                 div class="table-cell"
-                  #total_revenue
-              div class="table-row"
-                div class="table-cell"
-                  div Cost of Revenue
-                div class="table-cell"
-                  #cost_of_revenue
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Gross Profit
-                div class="table-cell"
-                  #gross_profit class="bold"
+                  div id="#{property}"
 
-          div class="security-content"
-            h2 Operating Expenses
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Research Development
-                div class="table-cell"
-                  #research_development
-              div class="table-row"
-                div class="table-cell"
-                  div Selling General and Administrative
-                div class="table-cell"
-                  #selling_general_and_administrative
-              div class="table-row"
-                div class="table-cell"
-                  div Non Recurring
-                div class="table-cell"
-                  #non_recurring
-              div class="table-row"
-                div class="table-cell"
-                  div Others
-                div class="table-cell"
-                  #others
-              div class="table-row"
-                div class="table-cell"
-                  div Total Operating Expenses
-                div class="table-cell"
-                  #total_operating_expenses
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Operating Income or Loss
-                div class="table-cell"
-                  #operating_income_or_loss class="bold"
-
-          div class="security-content"
-            h2 Income from Continuing Operations
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Total Other Income/Expenses Net
-                div class="table-cell"
-                  #total_other_income_Expenses_net
-              div class="table-row"
-                div class="table-cell"
-                  div Earnings Before Interest and Taxes
-                div class="table-cell"
-                  #earnings_before_interest_and_taxes
-              div class="table-row"
-                div class="table-cell"
-                  div Interest Expense
-                div class="table-cell"
-                  #interest_expense
-              div class="table-row"
-                div class="table-cell"
-                  div Interest Expense
-                div class="table-cell"
-                  #interest_expense
-              div class="table-row"
-                div class="table-cell"
-                  div Income Before Tax
-                div class="table-cell"
-                  #income_before_tax
-              div class="table-row"
-                div class="table-cell"
-                  div Income Tax Expense
-                div class="table-cell"
-                  #income_tax_expense
-              div class="table-row"
-                div class="table-cell"
-                  div Minority Interest
-                div class="table-cell"
-                  #minority_interest
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Net Income From Continuing Ops
-                div class="table-cell"
-                  #net_income_from_continuing_ops class="bold"
-
-          div class="security-content"
-            h2 Non-recurring Events
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Discontinued Operations
-                div class="table-cell"
-                  #discontinued_operations
-              div class="table-row"
-                div class="table-cell"
-                  div Extraordinary Items
-                div class="table-cell"
-                  #extraordinary_items
-              div class="table-row"
-                div class="table-cell"
-                  div Effect Of Accounting Changes
-                div class="table-cell"
-                  #effect_of_accounting_changes
-              div class="table-row"
-                div class="table-cell"
-                  div Other Items
-                div class="table-cell"
-                  #other_items
-
-          div class="security-content"
-            h2 Net Income
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Net Income
-                div class="table-cell"
-                  #net_income class="bold"
-              div class="table-row"
-                div class="table-cell"
-                  div Preferred Stock And Other Adjustments
-                div class="table-cell"
-                  #preferred_stock_and_other_adjustments
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Net Income Applicable To Common Shares
-                div class="table-cell"
-                  #net_income_applicable_to_common_shares class="bold"
   #tabs-balance
     - if @security.balance_sheets.size == 0
       h2 No Balance Sheets available for this Security
@@ -234,204 +106,27 @@ div id="tabs"
         select id="select-balance-date" name="date" title="Issued date"
           - @security.balance_sheets.each_with_index do |balance_sheet, i|
             option = balance_sheet.date.strftime("%d.%m.%Y")
-        #data-balance class="security-content"
-          div class="security-content"
-            h2 Current Assets
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Cash And Cash Equivalents
-                div class="table-cell"
-                  #cash_and_cash_equivalents
-              div class="table-row"
-                div class="table-cell"
-                  div Short Term Investments
-                div class="table-cell"
-                  #short_term_investments
-              div class="table-row"
-                div class="table-cell"
-                  div Net Receivables
-                div class="table-cell"
-                  #net_receivables
-              div class="table-row"
-                div class="table-cell"
-                  div Inventory
-                div class="table-cell"
-                  #inventory
-              div class="table-row"
-                div class="table-cell"
-                  div Other Current Assets
-                div class="table-cell"
-                  #other_current_assets
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Total Current Assets
-                div class="table-cell"
-                  #total_current_assets class="bold"
-          div class="security-content"
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Long Term Investments
-                div class="table-cell"
-                  #long_term_investments
-              div class="table-row"
-                div class="table-cell"
-                  div Property Plant and Equipment
-                div class="table-cell"
-                  #property_plant_and_equipment
-              div class="table-row"
-                div class="table-cell"
-                  div Goodwill
-                div class="table-cell"
-                  #goodwill
-              div class="table-row"
-                div class="table-cell"
-                  div Intangible Assets
-                div class="table-cell"
-                  #intangible_assets
-              div class="table-row"
-                div class="table-cell"
-                  div Accumulated Amortization
-                div class="table-cell"
-                  #accumulated_amortization
-              div class="table-row"
-                div class="table-cell"
-                  div Other Assets
-                div class="table-cell"
-                  #other_assets
-              div class="table-row"
-                div class="table-cell"
-                  div Deferred Long Term Asset Charges
-                div class="table-cell"
-                  #deferred_long_term_asset_charges
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Total Assets
-                div class="table-cell"
-                  #total_assets class="bold"
-          div class="security-content"
-            h2 Current Liabilities
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Accounts Payable
-                div class="table-cell"
-                  #accounts_payable
-              div class="table-row"
-                div class="table-cell"
-                  div Short/Current Long Term Debt
-                div class="table-cell"
-                  #short_current_long_term_debt
-              div class="table-row"
-                div class="table-cell"
-                  div Other Current Liabilities
-                div class="table-cell"
-                  #other_current_liabilities
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Total Current Liabilities
-                div class="table-cell"
-                  #total_current_liabilities class="bold"
-          div class="security-content"
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Long Term Debt
-                div class="table-cell"
-                  #long_term_debt
-              div class="table-row"
-                div class="table-cell"
-                  div Other Liabilities
-                div class="table-cell"
-                  #other_liabilities
-              div class="table-row"
-                div class="table-cell"
-                  div Deferred Long Term Liability Charges
-                div class="table-cell"
-                  #deferred_long_term_liability_charges
-              div class="table-row"
-                div class="table-cell"
-                  div Minority Interest
-                div class="table-cell"
-                  #minority_interest
-              div class="table-row"
-                div class="table-cell"
-                  div Negative Goodwill
-                div class="table-cell"
-                  #negative_goodwill
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Total Liabilities
-                div class="table-cell"
-                  #total_liabilities class="bold"
-          div class="security-content"
-            h2 Stockholders' Equity
-            div class="table"
-              div class="table-row"
-                div class="table-cell"
-                  div Misc. Stocks Options Warrants
-                div class="table-cell"
-                  #misc_stocks_options_warrants
-              div class="table-row"
-                div class="table-cell"
-                  div Redeemable Preferred Stock
-                div class="table-cell"
-                  #redeemable_preferred_stock
-              div class="table-row"
-                div class="table-cell"
-                  div Preferred Stock
-                div class="table-cell"
-                  #preferred_stock
-              div class="table-row"
-                div class="table-cell"
-                  div Common Stock
-                div class="table-cell"
-                  #common_stock
-              div class="table-row"
-                div class="table-cell"
-                  div Retained Earnings
-                div class="table-cell"
-                  #retained_earnings
-              div class="table-row"
-                div class="table-cell"
-                  div Treasury Stock
-                div class="table-cell"
-                  #treasury_stock
-              div class="table-row"
-                div class="table-cell"
-                  div Capital Surplus
-                div class="table-cell"
-                  #capital_surplus
-              div class="table-row"
-                div class="table-cell"
-                  div Other Stockholder Equity
-                div class="table-cell"
-                  #other_stockholder_equity
-              div class="table-row"
-                div class="table-cell"
-                  div Total Stockholder Equity
-                div class="table-cell"
-                  #total_stockholder_equity
-              div class="table-row"
-                div class="table-cell"
-                  div class="bold" Net Tangible Assets
-                div class="table-cell"
-                  #net_tangible_assets class="bold"
 
-
-
-
-
-
-  #tabs-trade
-    #data-trade class="security-content"
-      form class="buy" action="/security/trade" method ="post"
-        input type="hidden" name="_method" value="put"
-        input type="hidden" name="security_id" value==@security.id
-        label for="volume" Volume:
-        input class="volume" type="text" name="volume" title="Volume"
-        span class="volume"
-        p
-          button class="buy" Buy
+    #data-balance class="security-content"
+      - settings.balance_sheet_groups.each do |group_name, properties|
+        div class="security-content"
+          h2 = sym_to_string(group_name)
+          div class="table"
+            - properties.each do |property|
+              div class="table-row"
+                div class="table-cell"
+                  div = sym_to_string(property)
+                div class="table-cell"
+                  div id="#{property}"
+  - if logged_in?
+    #tabs-trade
+      #data-trade class="security-content"
+        form class="buy" action="/security/trade" method ="post"
+          input type="hidden" name="_method" value="put"
+          input type="hidden" name="security_id" value==@security.id
+          label for="volume" Volume:
+          input class="volume" type="text" name="volume" title="Volume"
+          span class="volume"
+          p
+            button class="buy" Buy
 

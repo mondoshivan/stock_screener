@@ -38,6 +38,86 @@ class SecurityController < Controller
             }
         }
     }
+
+    set :income_statement_groups, {
+        :revenue => [
+            :total_revenue,
+            :cost_of_revenue,
+            :gross_profit
+        ],
+        :operating_expenses => [
+            :research_development,
+            :selling_general_and_administrative,
+            :non_recurring,
+            :others,
+            :total_operating_expenses,
+            :operating_income_or_loss
+        ],
+        :income_from_continuing_operations => [
+            :total_other_income_expenses_net,
+            :earnings_before_interest_and_taxes,
+            :interest_expense,
+            :income_before_tax,
+            :income_tax_expense,
+            :minority_interest,
+            :net_income_from_continuing_ops
+        ],
+        :non_recurring_events => [
+            :discontinued_operations,
+            :extraordinary_items,
+            :effect_of_accounting_changes,
+            :other_items
+        ],
+        :net_income => [
+            :net_income,
+            :preferred_stock_and_other_adjustments,
+            :net_income_applicable_to_common_shares
+        ]
+    }
+
+    set :balance_sheet_groups, {
+        :current_assets => [
+            :cash_and_cash_equivalents,
+            :short_term_investments,
+            :net_receivables,
+            :inventory,
+            :other_current_assets,
+            :total_current_assets,
+            :long_term_investments,
+            :property_plant_and_equipment,
+            :goodwill,
+            :intangible_assets,
+            :accumulated_amortization,
+            :other_assets,
+            :deferred_long_term_asset_charges,
+            :total_assets
+        ],
+        :current_liabilities => [
+            :accounts_payable,
+            :short_current_long_term_debt,
+            :other_current_liabilities,
+            :total_current_liabilities,
+            :long_term_debt,
+            :other_liabilities,
+            :deferred_long_term_liability_charges,
+            :minority_interest,
+            :negative_goodwill,
+            :total_liabilities
+        ],
+        :stockholders_equity => [
+            :misc_stocks_options_warrants,
+            :redeemable_preferred_stock,
+            :preferred_stock,
+            :common_stock,
+            :retained_earnings,
+            :treasury_stock,
+            :capital_surplus,
+            :other_stockholder_equity,
+            :total_stockholder_equity,
+            :net_tangible_assets
+        ]
+    }
+
   end
 
 
@@ -59,21 +139,28 @@ class SecurityController < Controller
     end
   end
 
+  def sym_to_string(sym)
+    return sym.to_s.gsub('_', ' ').capitalize
+  end
+
 
   ##################
   # Route Handlers #
   ##################
 
   get '/' do
+    start = Time.now
     @security = find_security_with_id(params[:security_id])
+    logger.info "find security in DB: #{Time.now - start}"
 
     # error condition
     halt 404, slim(:not_found) unless @security
 
     # get data
+    start = Time.now
     tickers = [@security.ticker.name]
     @data = get_all_quotes(tickers)[0]
-    @data.to_h.each {|k,v| logger.info "#{k}: #{v}"}
+    logger.info "get all quotes: #{Time.now - start}"
 
     # get history
     @periods = {
@@ -83,11 +170,13 @@ class SecurityController < Controller
         'Max' => 0
     }
 
+    start = Time.now
     default = @periods['1Y']
     @history = get_history(
         @security.ticker.name,
         @periods[params[:period]] || default
     )
+    logger.info "get history: #{Time.now - start}"
 
     padding = 0.01
     @min = @history.values.min * (1 - padding)
