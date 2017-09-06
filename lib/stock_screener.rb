@@ -68,7 +68,12 @@ class StockScreener < Controller
   #################
 
   configure do
+    indexes = [
+        {:name => 'DAX', :ticker => '^GDAXI', :exchange => 'GER'},
+        {:name => '', :ticker => '^GDAXI', :exchange => 'GER'},
+    ]
 
+    indexes.each { |index| Index.first_or_create(index) }
   end
 
   configure :production do
