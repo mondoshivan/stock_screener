@@ -1,1 +1,10 @@
+h1 Index
 
+- unless @index.nil?
+  p ticker: #{@index.ticker}
+  p name: #{@index.name}
+  p exchange: #{@index.exchange}
+
+- unless @indexes.nil?
+  - @indexes.each do |index|
+    p ticker: #{index.ticker.name}, name: #{index.name}, exchange: #{index.exchange.name}

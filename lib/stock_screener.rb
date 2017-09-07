@@ -42,6 +42,7 @@ require 'stock_screener/controllers/search_controller'
 require 'stock_screener/controllers/portfolio_controller'
 require 'stock_screener/controllers/users_controller'
 require 'stock_screener/controllers/threads_controller'
+require 'stock_screener/controllers/index_controller'
 
 # Models
 require 'stock_screener/models/security'
@@ -52,6 +53,7 @@ require 'stock_screener/models/portfolio_items'
 require 'stock_screener/models/income_statement'
 require 'stock_screener/models/balance_sheet'
 require 'stock_screener/models/ticker'
+require 'stock_screener/models/index'
 
 YAHOO_FINANCE = YahooFinance::Client.new
 
@@ -62,18 +64,19 @@ class StockScreener < Controller
   helpers SecurityHelpers
   helpers StockScreenerHelpers
 
+  def initialize
+    super
+
+    init_indexes()
+  end
+
 
   #################
   # Configuration #
   #################
 
   configure do
-    indexes = [
-        {:name => 'DAX', :ticker => '^GDAXI', :exchange => 'GER'},
-        {:name => '', :ticker => '^GDAXI', :exchange => 'GER'},
-    ]
-
-    indexes.each { |index| Index.first_or_create(index) }
+    set :config_dir, settings.root + '/config'
   end
 
   configure :production do
@@ -99,6 +102,34 @@ class StockScreener < Controller
   end
 
 
+  ###########
+  # Helpers #
+  ###########
+
+  ############################
+  def init_indexes()
+    file = settings.config_dir + '/index.yaml'
+    YAML.load_file(file).each do |key, indexes|
+      indexes.each do |index|
+        Index.first_or_create(
+            :name => index['name'],
+            :exchange => Exchange.first_or_create(name: index['exchange']),
+            :ticker => Ticker.first_or_create(name: index['ticker'])
+        )
+      end
+    end
+  end
+
+  ############################
+  def create_user(name, password, admin)
+    User.create(
+        name: name,
+        password: password,
+        admin: admin
+    )
+  end
+
+
   ##################
   # Route Handlers #
   ##################
@@ -120,11 +151,7 @@ class StockScreener < Controller
       flash[:notice] = "Registration failed!"
       redirect to('/register')
     else
-      User.create(
-          name: params["username"],
-          password: params["password"],
-          admin: (params["admin"] == 'admin')
-      )
+      create_user(params["username"], params["password"], params["admin"] == 'admin')
       flash[:notice] = "New user registered!"
       redirect to('/login')
     end

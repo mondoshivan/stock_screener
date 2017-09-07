@@ -1,0 +1,10 @@
+index:
+  - name: DAX
+    ticker: ^GDAXI
+    exchange: GER
+  - name: MDAX
+    ticker: ^MDAXI
+    exchange: GER
+  - name: SDAX
+    ticker: ^SDAXI
+    exchange: GER

@@ -21,4 +21,5 @@ map('/security') { run SecurityController }
 map('/portfolio') { run PortfolioController }
 map('/users') { run UsersController }
 map('/threads') { run ThreadsController }
+map('/index') { run IndexController }
 map('/') { run StockScreener }
