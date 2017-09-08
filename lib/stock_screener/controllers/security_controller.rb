@@ -171,14 +171,25 @@ class SecurityController < Controller
     }
 
     start = Time.now
-    default = @periods['1Y']
+    interval = {
+        '1M' => '1d',
+        '6M' => '1d',
+        '1Y' => '1wk',
+        'Max' => '1mo'
+    }
     @history = get_history(
         @security.ticker.name,
-        @periods[params[:period]] || default
+        @periods[params[:period]] || @periods['1Y'],
+        interval[params[:period]] || interval['1Y']
     )
     logger.info "get history: #{Time.now - start}"
 
-    padding = 0.01
+    @history.each do |date, values|
+      @history[date] = values[:close_value]
+      logger.info "#{date}: #{values[:close_value]}"
+    end
+
+    padding = 0.05
     @min = @history.values.min * (1 - padding)
     @max = @history.values.max * (1 + padding)
 

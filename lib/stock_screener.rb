@@ -86,7 +86,7 @@ class StockScreener < Controller
     DataMapper.setup(:default, "sqlite3://#{settings.root}/production.db")
     DataMapper.auto_upgrade!
 
-    User.create(name: 'admin', password: 'admin', admin: true)
+    User.create(name: 'admin', password: 'admin', admin: true) if User.all.size == 0
   end
   configure :development do
     set :root, File.join(File.dirname(__FILE__), '..')
@@ -95,7 +95,7 @@ class StockScreener < Controller
     DataMapper.setup(:default, "sqlite3://#{settings.root}/development.db")
     DataMapper.auto_migrate!
 
-    User.create(name: 'admin', password: 'admin', admin: true)
+    User.create(name: 'admin', password: 'admin', admin: true) if User.all.size == 0
   end
   configure :test do
 

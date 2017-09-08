@@ -151,39 +151,108 @@ module SecurityHelpers
   # * *Args*    :
   #   - +ticker+ -> the ticker of the security
   #   - +number_of_days+ -> how far do we look in the past (0 = forever)
+  #   - +interval+ -> values: '1d', '1wk', '1mo'
   # * *Returns* :
   #   - hash {date=>value}: {'2017-08-08' => 15.16, ...}
   #
-  def get_history(ticker, number_of_days)
+  def get_history(ticker, number_of_days, interval='1d')
+    ####################################################
+    # Calculation:
+    #
+    #  start            iterator       stop
+    # |--:-----------------|------------:-|
+    #   1/17                           9/17
+    #                      |____________|
+    #                         iteration
+    ####################################################
+
     data = {}
-    interval = '1d'
     start = number_of_days == 0 ? Time.new(1980).to_i : Time.now().to_i - number_of_days * 24 * 60 * 60
     stop = Time.now.to_i
-    iteration = 30 * 4 * 24 * 60 * 60 # 4 month in seconds
-    start_temp = stop
+    today = Time.new(Time.now.year, Time.now.month, Time.now.day)
+    row_buffer = 0.5
 
-    while start != start_temp
-      start_temp = start > start_temp - iteration ? start : start_temp - iteration
+    case interval
+      when '1d'
+        iteration = 1 * 30 * 24 * 60 * 60 # seconds
+      when '1wk'
+        iteration = 12 * 30 * 24 * 60 * 60 # seconds
+      when '1mo'
+        iteration = 36 * 30 * 24 * 60 * 60 # seconds
+      else
+        raise RuntimeError, 'Illegal interval value received'
+    end
 
-      url = "https://finance.yahoo.com/quote/#{ticker.strip}/history?interval=#{interval}&period1=#{start}&period2=#{stop}"
+    iterator = start > stop - iteration ? start : stop - iteration
+    till_founding = number_of_days == 0
+    unexpected_dates = 0
+
+    case interval
+      when '1d'
+        expected_days = ((stop - iterator) / (3600 * 24)) * row_buffer
+      when '1wk'
+        expected_days = (((stop - iterator) / (3600 * 24)) / 7) * row_buffer
+      when '1mo'
+        expected_days = (((stop - iterator) / (3600 * 24)) / 30) * row_buffer
+      else
+        raise RuntimeError, 'Illegal interval value received'
+    end
+
+    while start != iterator
+      again = false # if illegal values are received, the iteration must be repeated
+      founding_date_reached = false
+
+      url = "https://finance.yahoo.com/quote/#{ticker.strip}/history?interval=#{interval}&period1=#{iterator}&period2=#{stop}"
       page = Nokogiri::HTML(open(url))
-      page.css('table')[1].css('tbody').css('tr').each do |row|
+      rows = page.css('table')[1].css('tbody').css('tr')
+      rows_size = rows.size
+
+      # check if the received rows are near the expected amount of days for this iteration
+      if rows_size < expected_days
+        unexpected_dates += 1
+        if unexpected_dates > 25 # seems like we reached the founding date
+          founding_date_reached = true
+        else
+          redo
+        end
+      else
+        unexpected_dates = 0
+      end
+      rows.each do |row|
         divs = row.css('td')
-        if divs[1].css('span').text  != 'Dividend'
+        is_dividend = divs[1].css('span').text =~ /dividend/i # row contains dividend information
+        is_split = divs[1].css('span').text =~ /split/i       # row contains split information
+        unless is_dividend || is_split
+          # get values
           time  = divs[0].css('span').text
           year  = time.split(',')[1].strip.to_i
           month = time.split(' ')[0].strip.downcase
           day   = time.split(',')[0].split(' ')[1].strip.to_i
           time  = Time.new(year, month, day)
 
-          time_now = Time.new(Time.now.year, Time.now.month, Time.now.day)
-          diff = (time_now - time) / (3600 * 24)
-          break if diff > number_of_days
+          # check if we have already all required values
+          current_row_days = (today - time) / (3600 * 24)
+          break if till_founding == false && current_row_days > number_of_days
 
-          value = divs[1].css('span').text.to_f
-          data[time.strftime("%F")] = value if value != 0
+          # save values
+          values = {
+              :open_value  => divs[1].css('span').text.to_f,
+              :high_value  => divs[2].css('span').text.to_f,
+              :low_value   => divs[3].css('span').text.to_f,
+              :close_value => divs[4].css('span').text.to_f,
+              :volume      => divs[6].css('span').text.to_f
+          }
+
+          if values.values.include?(0)
+            again = true
+            break
+          end
+          data[time.strftime("%F")] = values
         end
       end
+      break if founding_date_reached
+      redo if again
+      iterator = start > iterator - iteration ? start : iterator - iteration
       stop = stop - iteration
     end
 
@@ -238,6 +307,7 @@ module SecurityHelpers
 
   #################################################
   def get_change_color(change)
+    return nil if change.nil?
     if change < 0
       return "red"
     elsif change > 0
