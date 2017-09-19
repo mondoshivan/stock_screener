@@ -112,7 +112,7 @@ class SearchController < Controller
 
     tickers = []
     Ticker.all(
-        :name.like => "%#{params[:input]}%",
+        :name.like => "#{params[:input]}%",
         :fields => [:name],
         :order => [ :name.asc ]
     ).each { |ticker| tickers << ticker.name }
